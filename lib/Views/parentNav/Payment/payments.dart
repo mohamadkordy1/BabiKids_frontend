@@ -14,10 +14,7 @@ class PaymentPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: const Color(0xFF121212),
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Get.back(),
-        ),
+       
         title: Text(
           "Payment History",
           style: GoogleFonts.inter(

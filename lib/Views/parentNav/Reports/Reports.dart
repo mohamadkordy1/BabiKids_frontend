@@ -1,88 +1,138 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../../Controllers/ReportController.dart';
+import '../../../Controllers/ChildrenController.dart';
+import 'package:frontend/Views/parentNav/Reports/Report2.dart';
 
-class ParentReportsPage extends StatelessWidget {
-  const ParentReportsPage({super.key});
+class ReportsPage extends StatefulWidget {
+  const ReportsPage({super.key});
+
+  @override
+  State<ReportsPage> createState() => _ReportsPageState();
+}
+
+class _ReportsPageState extends State<ReportsPage> {
+  final ReportController reportController = Get.put(ReportController());
+  final ChildrenController childrenController = Get.find<ChildrenController>();
+
+  @override
+  void initState() {
+    super.initState();
+    reportController.fetchReports();
+  }
+
+  String getChildName(int childId) {
+    final child = childrenController.children.firstWhereOrNull((c) => c.id == childId);
+    return child?.name ?? 'Unknown Child';
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF111827), // background-dark
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF111827),
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text(
-          'Report History',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
+      backgroundColor: const Color(0xFF0C0E10),
+      body: SafeArea(
+        child: Obx(() {
+          if (reportController.reports.isEmpty) {
+            return const Center(
+              child: Text("No reports found", style: TextStyle(color: Colors.white)),
+            );
+          }
+
+          return ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: reportController.reports.length,
+            itemBuilder: (context, index) {
+              final report = reportController.reports[index];
+              final childName = getChildName(report.childId);
+
+              return FutureBuilder<String>(
+                future: reportController.getAuthorName(report.createdBy),
+                builder: (context, snapshot) {
+                  final authorName = snapshot.data ?? 'Loading...';
+
+                  return GestureDetector(
+                    onTap: () {
+                      // Navigate to ReportDetailsPage and pass the report
+                      Get.to(() => ReportDetailsPage(report: report, childName: childName, authorName: authorName));
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1C1C1C),
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.3),
+                            blurRadius: 6,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            childName,
+                            style: GoogleFonts.manrope(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            "By: $authorName",
+                            style: GoogleFonts.manrope(
+                              fontSize: 14,
+                              color: Colors.greenAccent,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            "Date: ${report.reportDate}",
+                            style: GoogleFonts.manrope(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          );
+        }),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
+
+
+    );
+  }
+
+  Widget _navItem({required IconData icon, required String label, bool active = false}) {
+    return GestureDetector(
+      onTap: () {
+        // TODO: Navigate to pages according to label
+        print("Navigate to $label");
+      },
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _reportTile('Ms. Amelia Davis', 'October 26, 2023'),
-          _reportTile('Mr. Benjamin Carter', 'October 24, 2023'),
-          _reportTile('Ms. Chloe Garcia', 'October 22, 2023'),
-          _reportTile('Mr. Daniel Evans', 'October 20, 2023'),
+          Icon(icon, color: active ? const Color(0xFF3B82F6) : const Color(0xFFA0A0A0)),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: GoogleFonts.manrope(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: active ? const Color(0xFF3B82F6) : const Color(0xFFA0A0A0),
+            ),
+          ),
         ],
       ),
-    
     );
   }
-
-  // ---------------- REPORT TILE ----------------
-  Widget _reportTile(String name, String date) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(16),
-      onTap: () {},
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: const Color(0xFF1F2937),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    name,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    date,
-                    style: const TextStyle(
-                      color: Color(0xFF9CA3AF),
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const Icon(
-              Icons.chevron_right,
-              color: Color(0xFF9CA3AF),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-
-
 }

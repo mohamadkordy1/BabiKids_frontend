@@ -21,14 +21,7 @@ class SettingsPage extends StatelessWidget {
                   SizedBox(
                     height: 48,
                     width: 48,
-                    child: IconButton(
-                      icon: const Icon(
-                        Icons.arrow_back,
-                        color: Colors.white,
-                        size: 28,
-                      ),
-                      onPressed: () => Get.back(),
-                    ),
+
                   ),
                   Expanded(
                     child: Text(
