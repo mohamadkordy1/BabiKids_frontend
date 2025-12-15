@@ -17,16 +17,25 @@ class RegistrationController extends GetxController {
 
   // ------------------- Registration API -------------------
   void registerUser() async {
+    // Use the updated User model
     User user = User(
+      id: 0, // temporary, API will generate the id
       name: name.text,
       email: email.text,
       PhoneNumber: PhoneNumber.text,
-      password: password.text,
-      password_confirmation: password_confirmation.text,
       role: 'parent',
     );
 
-    final requestBody = user.ToMap();
+    // Create request body
+    final requestBody = {
+      "name": user.name,
+      "email": user.email,
+      "PhoneNumber": user.PhoneNumber,
+      "role": user.role,
+      "password": password.text,
+      "password_confirmation": password_confirmation.text,
+    };
+
     print("Request Body: $requestBody");
 
     try {
@@ -38,12 +47,14 @@ class RegistrationController extends GetxController {
       if (response.statusCode == 201) {
         _showSuccessDialog();
       } else {
-        _showErrorDialog("Registration failed. Status code: ${response.statusCode}");
+        _showErrorDialog(
+            "Registration failed. Status code: ${response.statusCode}");
       }
     } catch (error) {
       _showErrorDialog(_parseErrorMessage(error));
     }
   }
+
 
   // ------------------- Success Dialog -------------------
   void _showSuccessDialog() {

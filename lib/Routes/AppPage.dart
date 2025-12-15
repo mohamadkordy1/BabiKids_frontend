@@ -1,9 +1,12 @@
 import 'package:get/get.dart';
+import '../Bindings/UserBinding.dart';
 import 'AppRoute.dart';
 import '../Views/Login.dart';
 import '../Bindings/LoginBinding.dart';
 import '../Views/Registration.dart';
 import '../Bindings/RegistrationBinding.dart';
+import '../Views/Parent/parent_home.dart';
+import 'package:frontend/Views/Parent/parent_shell.dart';
 class AppPage {
 
 
@@ -20,7 +23,15 @@ page: () => Registration(),
 binding: RegistrationBinding(),
 ),
 
-
+  GetPage(
+    name: AppRoute.home,
+    page: () => ParentHome(),
+    binding: UserBinding(),
+  ),
+  GetPage(
+    name: AppRoute.parentShell,
+    page: () => ParentShell(),
+  ),
 
 ]
 ;

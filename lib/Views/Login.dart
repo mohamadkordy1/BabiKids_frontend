@@ -3,12 +3,15 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:frontend/Routes/AppRoute.dart';
-class Login extends GetView<Logincontroller>{
-  
+final LoginController controller = Get.put(LoginController());
+
+class Login extends GetView<LoginController> {
+  const Login({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0C0E10), // background-dark
+      backgroundColor: const Color(0xFF0C0E10), // dark background
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
@@ -21,7 +24,7 @@ class Login extends GetView<Logincontroller>{
                   height: 64,
                   width: 64,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF3B82F6), // primary
+                    color: const Color(0xFF3B82F6),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: const Icon(
@@ -73,6 +76,7 @@ class Login extends GetView<Logincontroller>{
 
                 _buildInputField(
                   hint: "Enter your email",
+                  controller: controller.email,
                   obscure: false,
                 ),
 
@@ -92,10 +96,13 @@ class Login extends GetView<Logincontroller>{
                 ),
                 const SizedBox(height: 8),
 
-                _buildInputField(
+                Obx(() => _buildInputField(
                   hint: "Enter your password",
-                  obscure: true,
-                ),
+                  controller: controller.password,
+                  obscure: !controller.showPassword.value,
+                  isPassword: true,
+                  onToggle: () => controller.showPassword.toggle(),
+                )),
 
                 const SizedBox(height: 30),
 
@@ -110,7 +117,7 @@ class Login extends GetView<Logincontroller>{
                         borderRadius: BorderRadius.circular(16),
                       ),
                     ),
-                    onPressed: () {},
+                    onPressed: () => controller.loginUser(),
                     child: Text(
                       "Sign In",
                       style: GoogleFonts.manrope(
@@ -147,15 +154,19 @@ class Login extends GetView<Logincontroller>{
                       color: Color(0xFFE0E0E0),
                       fontSize: 14,
                     ),
-                    
                   ),
                   textAlign: TextAlign.center,
-                ),TextButton(onPressed: () {Get.toNamed(AppRoute.registrater);}, child: 
-                Text("Sign Up" ,
-                style: GoogleFonts.manrope(
-                          color: Color(0xFF3B82F6),
-                          fontWeight: FontWeight.w600,
-                        ),) )
+                ),
+                TextButton(
+                  onPressed: () => Get.toNamed(AppRoute.registrater),
+                  child: Text(
+                    "Sign Up",
+                    style: GoogleFonts.manrope(
+                      color: Color(0xFF3B82F6),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -164,8 +175,15 @@ class Login extends GetView<Logincontroller>{
     );
   }
 
-  Widget _buildInputField({required String hint, required bool obscure}) {
+  Widget _buildInputField({
+    required String hint,
+    required TextEditingController controller,
+    required bool obscure,
+    bool isPassword = false,
+    VoidCallback? onToggle,
+  }) {
     return TextField(
+      controller: controller,
       obscureText: obscure,
       style: GoogleFonts.manrope(color: Colors.white),
       decoration: InputDecoration(
@@ -185,8 +203,16 @@ class Login extends GetView<Logincontroller>{
             width: 2,
           ),
         ),
+        suffixIcon: isPassword
+            ? IconButton(
+          icon: Icon(
+            obscure ? Icons.visibility_off : Icons.visibility,
+            color: const Color(0xFFD1D5DB),
+          ),
+          onPressed: onToggle,
+        )
+            : null,
       ),
     );
   }
 }
-
