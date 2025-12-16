@@ -1,12 +1,28 @@
 import 'package:flutter/material.dart';
+import '../../../Models/Payment.dart';
 
 class PaymentDetailsPage extends StatelessWidget {
-  const PaymentDetailsPage({super.key});
+
+
+  const PaymentDetailsPage({required this.payment,super.key });
+  final Payment payment;
+  Color get statusColor {
+    switch (payment.status) {
+      case 'paid':
+        return const Color(0xFF4ADE80);
+      case 'pending':
+        return const Color(0xFFFACC15);
+      case 'overdue':
+        return Colors.redAccent;
+      default:
+        return Colors.grey;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF111827), // background-dark
+      backgroundColor: const Color(0xFF111827),
 
       // ---------------- APP BAR ----------------
       appBar: AppBar(
@@ -32,11 +48,11 @@ class PaymentDetailsPage extends StatelessWidget {
             const SizedBox(height: 24),
 
             // Title
-            const Text(
-              'Payment for Olivia',
-              style: TextStyle(
+            Text(
+              'Payment #${payment.id}',
+              style: const TextStyle(
                 color: Colors.white,
-                fontSize: 32,
+                fontSize: 28,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -45,6 +61,7 @@ class PaymentDetailsPage extends StatelessWidget {
 
             // Payment Details Card
             Container(
+              width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.06),
@@ -52,10 +69,10 @@ class PaymentDetailsPage extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  _detailRow('Payment ID', 'TRN-192837465'),
-                  _detailRow('Amount', '\$24.99', bold: true),
-                  _detailRow('Date of Payment', 'October 26, 2023'),
-                  _detailRow('Payment Method', 'Cash'),
+                  _detailRow('Payment ID', payment.id.toString()),
+                  _detailRow('Amount', '\$${payment.amount}', bold: true),
+                  _detailRow('Payment Date', payment.paymentDate),
+                  _detailRow('Payment Method', payment.paymentMethod),
                 ],
               ),
             ),
@@ -64,6 +81,7 @@ class PaymentDetailsPage extends StatelessWidget {
 
             // Status Card
             Container(
+              width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.06),
@@ -80,13 +98,13 @@ class PaymentDetailsPage extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 6),
                     decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.2),
+                      color: statusColor.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(999),
                     ),
-                    child: const Text(
-                      'Completed',
+                    child: Text(
+                      payment.status.toUpperCase(),
                       style: TextStyle(
-                        color: Color(0xFF4ADE80),
+                        color: statusColor,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -96,26 +114,6 @@ class PaymentDetailsPage extends StatelessWidget {
             ),
 
             const SizedBox(height: 100),
-          ],
-        ),
-      ),
-
-      // ---------------- BOTTOM NAV ----------------
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        decoration: const BoxDecoration(
-          color: Color(0xFF111827),
-          border: Border(
-            top: BorderSide(color: Color(0xFF374151)),
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _navItem(Icons.dashboard, 'Dashboard'),
-            _navItem(Icons.credit_card, 'Payments', active: true),
-            _navItem(Icons.bar_chart, 'Reports'),
-            _navItem(Icons.settings, 'Settings'),
           ],
         ),
       ),
@@ -129,10 +127,8 @@ class PaymentDetailsPage extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: const TextStyle(color: Color(0xFF9CA3AF)),
-          ),
+          Text(label,
+              style: const TextStyle(color: Color(0xFF9CA3AF))),
           Text(
             value,
             style: TextStyle(
@@ -143,23 +139,6 @@ class PaymentDetailsPage extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-
-  // ---------------- NAV ITEM ----------------
-  Widget _navItem(IconData icon, String label, {bool active = false}) {
-    final color = active ? const Color(0xFF3B82F6) : const Color(0xFF9CA3AF);
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, color: color, size: 26),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(color: color, fontSize: 12),
-        ),
-      ],
     );
   }
 }

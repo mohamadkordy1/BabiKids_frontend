@@ -15,7 +15,7 @@ class ParentShell extends StatelessWidget {
 
   final pages = [
     const ParentHome(),
-    const PaymentPage(),
+     PaymentPage(),
     const ReportsPage(),
     const SettingsPage(),
   ];
