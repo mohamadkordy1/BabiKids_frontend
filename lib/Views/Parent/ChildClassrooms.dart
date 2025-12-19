@@ -4,6 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '/Models/Child.dart';
 import '/Models/Classroom.dart';
 import '/Services/ChildService.dart';
+import 'ClassDetails.dart'; // make sure you create this page
+
 class ChildClassrooms extends StatefulWidget {
   final Child child;
   const ChildClassrooms({super.key, required this.child});
@@ -40,8 +42,14 @@ class _ChildClassroomsState extends State<ChildClassrooms> {
     return Scaffold(
       appBar: AppBar(
         title: Text("${widget.child.name}'s Classrooms",
-            style: GoogleFonts.manrope()),
+            style: GoogleFonts.manrope(
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+              color: Colors.white,
+            )),
         backgroundColor: const Color(0xFF0C0E10),
+        elevation: 0,
+        centerTitle: true,
       ),
       backgroundColor: const Color(0xFF0C0E10),
       body: Obx(() {
@@ -63,74 +71,86 @@ class _ChildClassroomsState extends State<ChildClassrooms> {
           );
         } else {
           return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: ListView.separated(
               itemCount: classrooms.length,
               separatorBuilder: (_, __) => const SizedBox(height: 16),
               itemBuilder: (context, index) {
                 final room = classrooms[index];
-                return GestureDetector(
-                  onTap: () {
-                    // TODO: Navigate to classroom details if needed
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF1F2224),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          height: 56,
-                          width: 56,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF3B82F6).withOpacity(0.2),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.school,
-                            color: Color(0xFF3B82F6),
-                            size: 28,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                room.name,
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                "Start: ${room.startTime}, End: ${room.endTime}",
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  color: Color(0xFFA0A0A0),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const Icon(
-                          Icons.chevron_right,
-                          color: Color(0xFFA0A0A0),
-                        )
-                      ],
-                    ),
-                  ),
-                );
+                return _classroomCard(room);
               },
             ),
           );
         }
       }),
+    );
+  }
+
+  Widget _classroomCard(Classroom room) {
+    return GestureDetector(
+      onTap: () {
+        // Navigate to ClassroomDetailPage with the classroom data
+        Get.to(() => ClassroomDetailPage(classroom: room,child:widget.child ,));
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1F2224),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              height: 56,
+              width: 56,
+              decoration: BoxDecoration(
+                color: const Color(0xFF3B82F6).withOpacity(0.2),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.school,
+                color: Color(0xFF3B82F6),
+                size: 28,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    room.name,
+                    style: GoogleFonts.manrope(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    "Start: ${room.startTime}, End: ${room.endTime}",
+                    style: GoogleFonts.manrope(
+                      fontSize: 14,
+                      color: const Color(0xFFA0A0A0),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(
+              Icons.chevron_right,
+              color: Color(0xFFA0A0A0),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
