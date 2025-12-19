@@ -1,7 +1,5 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:dio/dio.dart';
 import '../Core/Network/DioClient.dart';
 import '../Models/User.dart';
 import 'UserController.dart';
@@ -20,7 +18,7 @@ class LoginController extends GetxController {
     };
 
     try {
-      final response = await DioClient().gettInstance().post(
+      final response = await DioClient.dio.post(
         '/login',
         data: requestBody,
       );
@@ -28,7 +26,7 @@ class LoginController extends GetxController {
       if (response.statusCode == 200) {
         final data = response.data;
 
-        // Save user and token in permanent controllers
+        // Save user
         final userController =
         Get.put(UserController(), permanent: true);
         final childrenController =
@@ -42,15 +40,16 @@ class LoginController extends GetxController {
           role: data['user']['role'],
         );
 
+        // ✅ SET TOKEN ONCE (CRITICAL)
         userController.accessToken.value = data['access_token'];
+        DioClient.setToken(data['access_token']);
 
-        // Load children
+        // Load protected data
         await childrenController.loadChildren();
 
-        // Navigate to home
         Get.offAllNamed(AppRoute.parentShell);
       } else {
-        Get.snackbar('Error', 'Login failed: ${response.statusCode}');
+        Get.snackbar('Error', 'Login failed');
       }
     } catch (e) {
       Get.snackbar('Error', 'Login error: $e');

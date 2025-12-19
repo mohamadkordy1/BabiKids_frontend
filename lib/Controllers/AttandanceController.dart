@@ -18,15 +18,9 @@ import 'UserController.dart';class AttendanceController extends GetxController {
       isLoading.value = true;
 
       final userController = Get.find<UserController>();
+      final dio = DioClient.dio;
 
-      final response = await DioClient().gettInstance().get(
-        '/attendance',
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer ${userController.accessToken.value}',
-          },
-        ),
-      );
+      final response = await dio.get('/attendance');
 
       print("Attendance API response: ${response.data}");
 

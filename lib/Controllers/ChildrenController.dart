@@ -25,15 +25,9 @@ class ChildrenController extends GetxController {
   Future<void> loadChildren() async {
     try {
       final userController = Get.find<UserController>();
+      final dio = DioClient.dio;
 
-      final response = await DioClient().gettInstance().get(
-        '/children',
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer ${userController.accessToken.value}',
-          },
-        ),
-      );
+      final response =  await dio.get('/children');
 
       final dataJson = response.data is String
           ? jsonDecode(response.data)

@@ -22,8 +22,8 @@ class UserController extends GetxController {
 
   Future<void> fetchUser() async {
     try {
-      final response = await DioClient().gettInstance().get(
-        '/users/${user.value?.id ?? 2}', // replace 2 with current user ID if needed
+      final response = await DioClient.dio.get(
+        '/users/${user.value!.id}', // replace 2 with current user ID if needed
         options: Options(
           headers: {'Authorization': 'Bearer $accessToken'},
         ),
@@ -43,7 +43,7 @@ class UserController extends GetxController {
     if (user.value == null) return;
 
     try {
-      final response = await DioClient().gettInstance().put(
+      final response = await DioClient.dio.put(
         '/users/${user.value!.id}',
         data: {
           'name': name,
@@ -52,6 +52,7 @@ class UserController extends GetxController {
           'password': password.value,
           'password_confirmation': password.value,
           'role': user.value!.role,
+
         },
         options: Options(
           headers: {'Authorization': 'Bearer $accessToken'},

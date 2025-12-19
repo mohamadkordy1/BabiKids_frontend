@@ -4,6 +4,10 @@ import 'package:get/get.dart';
 import '/Models/Classroom.dart';
 import '../../Controllers/AttandanceController.dart';
   import 'package:frontend/Models/Child.dart';
+import 'package:get/get.dart';
+import '../../Controllers/ProgressController.dart';
+import '../../Models/Progress.dart' as model;
+
 class ClassroomDetailPage extends StatefulWidget {
   final Classroom classroom;
   final Child child;
@@ -16,12 +20,15 @@ class ClassroomDetailPage extends StatefulWidget {
 
 class _ClassroomDetailPageState extends State<ClassroomDetailPage> {
   final AttendanceController attendanceController = Get.put(AttendanceController());
+  final ProgressController progressController = Get.put(ProgressController());
 
   final int totalDays = 30; // Example for September
 
   @override
   void initState() {
     super.initState();
+    progressController.loadProgressForClass(widget.classroom.id);
+
     attendanceController.fetchAttendance(
       classroomId: widget.classroom.id,
       childId: widget.child.id,
@@ -51,154 +58,259 @@ class _ClassroomDetailPageState extends State<ClassroomDetailPage> {
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
-        child: Obx(() {
-          final percent = attendanceController.presentPercentage(totalDays);
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Classroom info
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1A1C1E),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(widget.classroom.name,
-                        style: GoogleFonts.poppins(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white)),
-                    const SizedBox(height: 8),
-                    Text("Time: ${widget.classroom.startTime} - ${widget.classroom.endTime}",
-                        style: const TextStyle(color: Colors.grey, fontSize: 14)),
-                    const SizedBox(height: 4),
-                    Text("Teacher: ${widget.classroom.teacher}",
-                        style: const TextStyle(color: Colors.grey, fontSize: 14)),
-                    const SizedBox(height: 4),
-                    Text("Child: ${widget.child.name}",
-                        style: const TextStyle(color: Colors.grey, fontSize: 14)),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 24),
-              // Attendance
-              Text("Attendance Overview",
-                  style: GoogleFonts.poppins(
-                      fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1A1C1E),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Column(
+          children: [
+            Obx(() {
+              final percent = attendanceController.presentPercentage(totalDays);
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Classroom info
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1A1C1E),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text("Attendence",
-                            style: TextStyle(
-                                color: Colors.white,
+                        Text(widget.classroom.name,
+                            style: GoogleFonts.poppins(
+                                fontSize: 22,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 16)),
-                        Text("${percent.toStringAsFixed(0)}% Present",
-                            style: const TextStyle(
-                                color: Color(0xFF3B82F6),
-                                fontWeight: FontWeight.w600)),
+                                color: Colors.white)),
+                        const SizedBox(height: 8),
+                        Text("Time: ${widget.classroom.startTime} - ${widget.classroom.endTime}",
+                            style: const TextStyle(color: Colors.grey, fontSize: 14)),
+                        const SizedBox(height: 4),
+                        Text("Teacher: ${widget.classroom.teacher}",
+                            style: const TextStyle(color: Colors.grey, fontSize: 14)),
+                        const SizedBox(height: 4),
+                        Text("Child: ${widget.child.name}",
+                            style: const TextStyle(color: Colors.grey, fontSize: 14)),
                       ],
-                    ),Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+                  // Attendance
+                  Text("Attendance Overview",
+                      style: GoogleFonts.poppins(
+                          fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1A1C1E),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Column(
                       children: [
-                        DropdownButton<int>(
-                          value: attendanceController.selectedMonth.value,
-                          dropdownColor: const Color(0xFF1A1C1E),
-                          items: List.generate(12, (index) {
-                            final month = index + 1;
-                            return DropdownMenuItem(
-                              value: month,
-                              child: Text(
-                                month.toString(),
-                                style: const TextStyle(color: Colors.white),
-                              ),
-                            );
-                          }),
-                          onChanged: (value) {
-                            if (value != null) {
-                              attendanceController.changeMonthYear(
-                                value,
-                                attendanceController.selectedYear.value,
-                              );
-                            }
-                          },
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text("Attendence",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16)),
+                            Text("${percent.toStringAsFixed(0)}% Present",
+                                style: const TextStyle(
+                                    color: Color(0xFF3B82F6),
+                                    fontWeight: FontWeight.w600)),
+                          ],
+                        ),Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            DropdownButton<int>(
+                              value: attendanceController.selectedMonth.value,
+                              dropdownColor: const Color(0xFF1A1C1E),
+                              items: List.generate(12, (index) {
+                                final month = index + 1;
+                                return DropdownMenuItem(
+                                  value: month,
+                                  child: Text(
+                                    month.toString(),
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                );
+                              }),
+                              onChanged: (value) {
+                                if (value != null) {
+                                  attendanceController.changeMonthYear(
+                                    value,
+                                    attendanceController.selectedYear.value,
+                                  );
+                                }
+                              },
+                            ),
+
+                            DropdownButton<int>(
+                              value: attendanceController.selectedYear.value,
+                              dropdownColor: const Color(0xFF1A1C1E),
+                              items: List.generate(5, (index) {
+                                final year = DateTime.now().year - index;
+                                return DropdownMenuItem(
+                                  value: year,
+                                  child: Text(
+                                    year.toString(),
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                );
+                              }),
+                              onChanged: (value) {
+                                if (value != null) {
+                                  attendanceController.changeMonthYear(
+                                    attendanceController.selectedMonth.value,
+                                    value,
+                                  );
+                                }
+                              },
+                            ),
+                          ],
                         ),
 
-                        DropdownButton<int>(
-                          value: attendanceController.selectedYear.value,
-                          dropdownColor: const Color(0xFF1A1C1E),
-                          items: List.generate(5, (index) {
-                            final year = DateTime.now().year - index;
-                            return DropdownMenuItem(
-                              value: year,
+                        const SizedBox(height: 12),
+                        GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 7,
+                            crossAxisSpacing: 4,
+                            mainAxisSpacing: 4,
+                          ),
+                          itemCount: totalDays,
+                          itemBuilder: (context, index) {
+                            final day = index + 1;
+                            final isPresent = attendanceController.isPresent(day);
+                            return Container(
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: isPresent
+                                    ? const Color(0xFF3B82F6).withOpacity(0.3)
+                                    : Colors.transparent,
+                                shape: BoxShape.circle,
+                              ),
                               child: Text(
-                                year.toString(),
-                                style: const TextStyle(color: Colors.white),
+                                "$day",
+                                style: TextStyle(
+                                    color: isPresent ? const Color(0xFF3B82F6) : Colors.grey[400],
+                                    fontWeight: FontWeight.bold),
                               ),
                             );
-                          }),
-                          onChanged: (value) {
-                            if (value != null) {
-                              attendanceController.changeMonthYear(
-                                attendanceController.selectedMonth.value,
-                                value,
-                              );
-                            }
                           },
                         ),
                       ],
                     ),
+                  ),
+                ],
+              );
+            }),
+            Obx(() {
+              if (progressController.isLoading.value) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-                    const SizedBox(height: 12),
-                    GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 7,
-                        crossAxisSpacing: 4,
-                        mainAxisSpacing: 4,
-                      ),
-                      itemCount: totalDays,
-                      itemBuilder: (context, index) {
-                        final day = index + 1;
-                        final isPresent = attendanceController.isPresent(day);
-                        return Container(
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: isPresent
-                                ? const Color(0xFF3B82F6).withOpacity(0.3)
-                                : Colors.transparent,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Text(
-                            "$day",
-                            style: TextStyle(
-                                color: isPresent ? const Color(0xFF3B82F6) : Colors.grey[400],
-                                fontWeight: FontWeight.bold),
-                          ),
-                        );
-                      },
+              if (progressController.progresses.isEmpty) {
+                return const Text(
+                  "No progress added for this class yet",
+                  style: TextStyle(color: Colors.white70),
+                );
+              }
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Progress Overview",
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
-                  ],
-                ),
-              ),
-            ],
-          );
-        }),
+                  ),
+                  const SizedBox(height: 16),
+                  ...progressController.progresses.map(progressCard).toList(),
+                ],
+              );
+            })
+          ],
+        ),
+
       ),
     );
   }
+}
+
+
+
+
+
+Widget progressCard(model.Progress p) {
+  Color statusColor;
+  String statusText;
+
+  switch (p.status) {
+    case 'completed':
+      statusColor = Colors.green;
+      statusText = 'Completed';
+      break;
+    case 'in_progress':
+      statusColor = Colors.blue;
+      statusText = 'In Progress';
+      break;
+    default:
+      statusColor = Colors.grey;
+      statusText = 'Not Started';
+  }
+
+  return Container(
+    margin: const EdgeInsets.only(bottom: 16),
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: Colors.black87,
+      borderRadius: BorderRadius.circular(16),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              p.goalTitle,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: statusColor.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                statusText,
+                style: TextStyle(color: statusColor),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Text("Start: ${p.startDate}",
+            style: const TextStyle(color: Colors.white70)),
+        Text("Target: ${p.targetDate}",
+            style: const TextStyle(color: Colors.white70)),
+        const SizedBox(height: 12),
+        Text(
+          p.notes,
+          style: const TextStyle(color: Colors.white),
+        ),
+      ],
+    ),
+  );
 }

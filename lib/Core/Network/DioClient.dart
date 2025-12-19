@@ -1,22 +1,19 @@
 import 'package:dio/dio.dart';
 
-
 class DioClient {
-Dio gettInstance() {
-return Dio(
+  static final Dio dio = Dio(
+    BaseOptions(
+      baseUrl: 'http://babikids.test/api/v1',
+      connectTimeout: const Duration(milliseconds: 5000),
+      receiveTimeout: const Duration(milliseconds: 3000),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    ),
+  );
 
-
-BaseOptions(
-  baseUrl: 'http://babikids.test/api/v1', // Replace with your API base URL
-
-  connectTimeout: Duration(milliseconds: 5000),
-  receiveTimeout: Duration(milliseconds: 3000),
-  headers:  {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-  },
-)
-
- );}
-
+  static void setToken(String token) {
+    dio.options.headers['Authorization'] = 'Bearer $token';
+  }
 }

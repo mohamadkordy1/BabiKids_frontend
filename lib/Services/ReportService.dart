@@ -9,15 +9,9 @@ class ReportService {
   static Future<List<Report>> getReports() async {
     try {
       final userController = Get.find<UserController>();
+      final dio = DioClient.dio;
 
-      final response = await DioClient().gettInstance().get(
-        '/reports',
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer ${userController.accessToken.value}',
-          },
-        ),
-      );
+      final response =  await dio.get('/reports');
 
       final dataJson = response.data is String
           ? jsonDecode(response.data)

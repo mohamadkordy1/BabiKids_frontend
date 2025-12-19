@@ -14,15 +14,9 @@ class PaymentController extends GetxController {
   Future<void> fetchPayments() async {
     try {
       isLoading.value = true;
+      final dio = DioClient.dio;
 
-      final response = await DioClient().gettInstance().get(
-        '/payments',
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer ${userController.accessToken.value}',
-          },
-        ),
-      );
+      final response = await dio.get('/payments');
 
       final dataJson =
       response.data is String ? jsonDecode(response.data) : response.data;

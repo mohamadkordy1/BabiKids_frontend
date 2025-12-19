@@ -48,16 +48,9 @@ class EditAccountController extends GetxController {
 
       /// 🔍 DEBUG (VERY IMPORTANT)
       print("SENDING BODY => $body");
+      final dio = DioClient.dio;
 
-      final response = await DioClient().gettInstance().put(
-        '/users/${userController.user.value!.id}',
-        data: body,
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer ${userController.accessToken.value}',
-          },
-        ),
-      );
+      final response = await dio.get('/users/${userController.user.value!.id}');
 
       userController.user.value = userController.user.value!.copyWith(
         name: name.value,

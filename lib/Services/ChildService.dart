@@ -11,15 +11,9 @@ class ChildService {
     try {
       final userController = Get.find<UserController>();
       final token = userController.accessToken.value;
+      final dio = DioClient.dio;
 
-      final response = await DioClient().gettInstance().get(
-        '/children',
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $token',
-          },
-        ),
-      );
+      final response =await dio.get('/children');
 
       if (response.statusCode == 200) {
         final data = response.data['data'] as List;
@@ -36,15 +30,9 @@ class ChildService {
     try {
       final userController = Get.find<UserController>();
       final token = userController.accessToken.value;
+      final dio = DioClient.dio;
+      final response =       await dio.get('/children/$childId/classrooms');
 
-      final response = await DioClient().gettInstance().get(
-        '/children/$childId/classrooms',
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $token',
-          },
-        ),
-      );
 
       if (response.statusCode == 200) {
         final classroomsData = response.data['classrooms'] as List;
