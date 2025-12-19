@@ -17,7 +17,7 @@ class ParentShell extends StatelessWidget {
     const ParentHome(),
      PaymentPage(),
     const ReportsPage(),
-    const SettingsPage(),
+     SettingsPage(),
   ];
 
   @override

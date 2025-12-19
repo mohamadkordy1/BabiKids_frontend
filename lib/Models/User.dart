@@ -1,14 +1,14 @@
 import 'dart:convert';
 
 class User {
-  final int id;
-  final String name;
-  final String email;
-  final String PhoneNumber;
-  final String role;
-  final String? createdAt;
-  final String? updatedAt;
-  final String? deletedAt;
+   int id;
+   String name;
+   String email;
+   String PhoneNumber;
+   String role;
+   String? createdAt;
+   String? updatedAt;
+   String? deletedAt;
 
   User({
     required this.id,
@@ -20,6 +20,22 @@ class User {
     this.updatedAt,
     this.deletedAt,
   });
+  User copyWith({
+    int? id,
+    String? name,
+    String? email,
+    String? phoneNumber,
+    String? role,
+  }) {
+    return User(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      PhoneNumber: phoneNumber ?? this.PhoneNumber,
+      role: role ?? this.role,
+    );
+  }
+
 
   // ------------------- Convert JSON Map to User -------------------
   factory User.fromJson(Map<String, dynamic> json) {

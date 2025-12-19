@@ -1,111 +1,104 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../../Controllers/UserController.dart';
+import '../../../Controllers/LogoutController.dart';
+import 'setting2.dart';
 
 class SettingsPage extends StatelessWidget {
-  const SettingsPage({super.key});
+  SettingsPage({super.key});
+
+  final userController = Get.find<UserController>();
+  final LogoutController logoutController = Get.put(LogoutController());
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF111827),
-
       body: SafeArea(
         child: Column(
           children: [
-            // HEADER
+            // ---------------- HEADER ----------------
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-              child: Row(
-                children: [
-                  SizedBox(
-                    height: 48,
-                    width: 48,
-
-                  ),
-                  Expanded(
-                    child: Text(
-                      "Account Settings",
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.inter(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 48),
-                ],
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Text(
+                "Account Settings",
+                style: GoogleFonts.inter(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
               ),
             ),
 
-            // CONTENT
+            // ---------------- CONTENT ----------------
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _label("Name"),
-                    _input(
-                      initialValue: "Alex Doe",
-                      obscure: false,
-                    ),
-                    const SizedBox(height: 20),
+                padding: const EdgeInsets.all(16),
+                child: Obx(() {
+                  final user = userController.user.value;
 
-                    _label("Email"),
-                    _input(
-                      initialValue: "alex.doe@example.com",
-                      obscure: false,
-                    ),
-                    const SizedBox(height: 20),
+                  if (user == null) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
 
-                    _label("Password"),
-                    _input(
-                      initialValue: "********",
-                      obscure: true,
-                    ),
-                    const SizedBox(height: 24),
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _label("Name"),
+                      _displayField(user.name),
+                      const SizedBox(height: 20),
 
-                    // PRIMARY BUTTON
-                    _primaryButton(
-                      text: "Edit Account Information",
-                      onPressed: () {
-                        // TODO: open edit mode / API call
-                      },
-                    ),
-                    const SizedBox(height: 12),
+                      _label("Email"),
+                      _displayField(user.email),
+                      const SizedBox(height: 20),
 
-                    // SECONDARY BUTTON
-                    _secondaryButton(
-                      text: "Change Password",
-                      onPressed: () {
-                        // TODO: navigate to change password
-                      },
-                    ),
+                      _label("Phone Number"),
+                      _displayField(user.PhoneNumber ?? "—"),
+                      const SizedBox(height: 20),
 
-                    const SizedBox(height: 32),
+                      _label("Password"),
+                      _displayField("********"),
+                      const SizedBox(height: 32),
 
-                    // LOGOUT
-                    _logoutButton(
-                      onPressed: () {
-                        // TODO: logout logic
-                      },
-                    ),
-                  ],
-                ),
+                      // -------- EDIT BUTTON --------
+                      _primaryButton(
+                        text: "Edit Account Information",
+                        onPressed: () {
+                          Get.to(() => const EditAccountPage());
+                        },
+                      ),
+                      const SizedBox(height: 12),
+
+                      // -------- CHANGE PASSWORD --------
+                      _secondaryButton(
+                        text: "Change Password",
+                        onPressed: () {
+                          // TODO: Change password page
+                        },
+                      ),
+                      const SizedBox(height: 32),
+
+                      // -------- LOGOUT --------
+                      _logoutButton(
+                        onPressed: () async {
+                          await logoutController.logout();
+                        },
+                      ),
+                    ],
+                  );
+                }),
               ),
             ),
           ],
         ),
       ),
-
-      // BOTTOM NAV
-
     );
   }
 
-  // ---------- UI HELPERS ----------
+  // ---------------- UI HELPERS ----------------
 
   Widget _label(String text) {
     return Padding(
@@ -121,29 +114,20 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
-  Widget _input({
-    required String initialValue,
-    required bool obscure,
-  }) {
-    return TextFormField(
-      initialValue: initialValue,
-      obscureText: obscure,
-      style: GoogleFonts.inter(color: Colors.white),
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: const Color(0xFF1F2937),
-        contentPadding:
-        const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(
-            color: Color(0xFF3B82F6),
-            width: 2,
-          ),
+  Widget _displayField(String value) {
+    return Container(
+      height: 56,
+      alignment: Alignment.centerLeft,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1F2937),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        value,
+        style: GoogleFonts.inter(
+          fontSize: 16,
+          color: Colors.white,
         ),
       ),
     );
@@ -186,7 +170,6 @@ class SettingsPage extends StatelessWidget {
       child: OutlinedButton(
         style: OutlinedButton.styleFrom(
           backgroundColor: const Color(0xFF1F2937),
-          side: BorderSide.none,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -225,42 +208,6 @@ class SettingsPage extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-// ---------- BOTTOM NAV ITEM ----------
-
-class BottomNavItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool active;
-
-  const BottomNavItem({
-    super.key,
-    required this.icon,
-    required this.label,
-    required this.active,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final color = active ? const Color(0xFF3B82F6) : const Color(0xFF9CA3AF);
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, color: color, size: 26),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: GoogleFonts.inter(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: color,
-          ),
-        ),
-      ],
     );
   }
 }
