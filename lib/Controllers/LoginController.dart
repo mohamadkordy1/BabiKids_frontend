@@ -11,9 +11,10 @@ class LoginController extends GetxController {
   TextEditingController password = TextEditingController();
   var showPassword = false.obs;
 
+  /// Login user and navigate based on role
   void loginUser() async {
     final requestBody = {
-      'email': email.text,
+      'email': email.text.trim(),
       'password': password.text,
     };
 
@@ -26,30 +27,33 @@ class LoginController extends GetxController {
       if (response.statusCode == 200) {
         final data = response.data;
 
-        // Save user
-        final userController =
-        Get.put(UserController(), permanent: true);
-        final childrenController =
-        Get.put(ChildrenController(), permanent: true);
+        // Initialize controllers
+        final userController = Get.put(UserController(), permanent: true);
+        final childrenController = Get.put(ChildrenController(), permanent: true);
 
-        userController.user.value = User(
-          id: data['user']['id'],
-          name: data['user']['name'],
-          email: data['user']['email'],
-          PhoneNumber: data['user']['PhoneNumber'],
-          role: data['user']['role'],
+        // Set user and token
+        userController.setUser(
+          User.fromJson(data['user']),
+          data['access_token'],
         );
 
-        // ✅ SET TOKEN ONCE (CRITICAL)
-        userController.accessToken.value = data['access_token'];
+        // Set token globally for all future requests
         DioClient.setToken(data['access_token']);
 
-        // Load protected data
-        await childrenController.loadChildren();
+        // Load children if parent
+        if (data['user']['role'] == 'parent') {
+          await childrenController.fetchChildren();
+        }
 
-        Get.offAllNamed(AppRoute.parentShell);
+        // Navigate based on role
+        final role = data['user']['role'];
+        if (role == 'teacher') {
+          Get.offAllNamed(AppRoute.teacherDashboard);
+        } else {
+          Get.offAllNamed(AppRoute.parentShell); // default = parent
+        }
       } else {
-        Get.snackbar('Error', 'Login failed');
+        Get.snackbar('Error', 'Login failed: ${response.statusCode}');
       }
     } catch (e) {
       Get.snackbar('Error', 'Login error: $e');

@@ -1,47 +1,36 @@
-import 'dart:convert';
 import 'package:get/get.dart';
 import '../Models/Child.dart';
-import 'package:dio/dio.dart';
 import '../Core/Network/DioClient.dart';
-import '../Services/ChildService.dart';
 import 'UserController.dart';
 
 class ChildrenController extends GetxController {
   var children = <Child>[].obs;
+  var isLoading = false.obs;
   var user = Get.find<UserController>().user;
+  final userController = Get.find<UserController>();
 
-  void fetchChildren() async {
+  Future<void> fetchChildren() async {
     try {
-      children.value = await ChildService.getChildren();
+      isLoading.value = true;
+
+      final response = await DioClient.dio.get('/children');
+      final List data = response.data['data'];
+
+      final allChildren =
+      data.map((e) => Child.fromJson(e)).toList();
+
+      final parentId = userController.user.value!.id;
+
+      // ✅ FRONTEND FILTERING HERE
+      children.value = allChildren
+          .where((child) => child.parentId == parentId)
+          .toList();
+
+      print("Filtered ${children.length} children");
     } catch (e) {
       print("Error loading children: $e");
-    }
-  }
-
-
-
-
-
-  Future<void> loadChildren() async {
-    try {
-      final userController = Get.find<UserController>();
-      final dio = DioClient.dio;
-
-      final response =  await dio.get('/children');
-
-      final dataJson = response.data is String
-          ? jsonDecode(response.data)
-          : response.data;
-
-      if (dataJson != null && dataJson['data'] != null) {
-        final List dataList = dataJson['data'];
-        children.value = dataList.map((json) => Child.fromJson(json)).toList();
-        print("Loaded ${children.length} children");
-      } else {
-        print("No data found in response");
-      }
-    } catch (e) {
-      print("Error loading children: $e");
+    } finally {
+      isLoading.value = false;
     }
   }
 }

@@ -7,6 +7,7 @@ import '../Views/Registration.dart';
 import '../Bindings/RegistrationBinding.dart';
 import '../Views/Parent/parent_home.dart';
 import 'package:frontend/Views/Parent/parent_shell.dart';
+import 'package:frontend/Views/Teacher/Teacher_Home.dart';
 class AppPage {
 
 
@@ -32,7 +33,10 @@ binding: RegistrationBinding(),
     name: AppRoute.parentShell,
     page: () => ParentShell(),
   ),
-
+  GetPage(
+    name: AppRoute.teacherDashboard,
+    page: () => const TeacherDashboardPage(),
+  ),
 ]
 ;
 }

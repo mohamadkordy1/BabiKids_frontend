@@ -3,7 +3,8 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../Controllers/UserController.dart';
 import '../../../Controllers/LogoutController.dart';
-import 'setting2.dart';
+import '../parentNav/Settings/Setting2.dart';
+import 'navbar.dart';
 
 class SettingsPage extends StatelessWidget {
   SettingsPage({super.key});
@@ -95,10 +96,13 @@ class SettingsPage extends StatelessWidget {
                   );
                 }),
               ),
+
             ),
           ],
         ),
       ),
+      bottomNavigationBar: const TeacherBottomNav(currentIndex: 1),
+
     );
   }
 

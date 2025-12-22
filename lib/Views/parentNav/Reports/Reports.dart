@@ -24,8 +24,9 @@ class _ReportsPageState extends State<ReportsPage> {
 
   String getChildName(int childId) {
     final child = childrenController.children.firstWhereOrNull((c) => c.id == childId);
-    return child?.name ?? 'Unknown Child';
+    return child!.name; // safe because filtered already
   }
+
 
   @override
   Widget build(BuildContext context) {

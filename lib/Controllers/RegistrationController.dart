@@ -37,10 +37,15 @@ class RegistrationController extends GetxController {
     };
 
     print("Request Body: $requestBody");
-    final dio = DioClient.dio;
+    final dio = DioClient.publicDio;
 
     try {
-      final response = await dio.post('/children');
+      final response = await dio.post(
+        '/register',
+        data: requestBody,
+      );
+
+
 
       if (response.statusCode == 201) {
         _showSuccessDialog();
