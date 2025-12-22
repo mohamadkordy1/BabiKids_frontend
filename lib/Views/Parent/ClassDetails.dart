@@ -7,7 +7,10 @@ import '../../Controllers/AttandanceController.dart';
 import 'package:get/get.dart';
 import '../../Controllers/ProgressController.dart';
 import '../../Models/Progress.dart' as model;
+import 'package:frontend/Models/Activity.dart';
+import 'package:frontend/Controllers/ActivityController.dart';
 
+import 'ActivityDetails.dart';
 class ClassroomDetailPage extends StatefulWidget {
   final Classroom classroom;
   final Child child;
@@ -21,6 +24,7 @@ class ClassroomDetailPage extends StatefulWidget {
 class _ClassroomDetailPageState extends State<ClassroomDetailPage> {
   final AttendanceController attendanceController = Get.put(AttendanceController());
   final ProgressController progressController = Get.put(ProgressController());
+  final ActivityController activityController = Get.put(ActivityController());
 
   final int totalDays = 30; // Example for September
 
@@ -28,7 +32,7 @@ class _ClassroomDetailPageState extends State<ClassroomDetailPage> {
   void initState() {
     super.initState();
     progressController.loadProgressForClass(widget.classroom.id);
-
+    activityController.loadActivitiesForClass(widget.classroom.id);
     attendanceController.fetchAttendance(
       classroomId: widget.classroom.id,
       childId: widget.child.id,
@@ -60,38 +64,14 @@ class _ClassroomDetailPageState extends State<ClassroomDetailPage> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
+
             Obx(() {
               final percent = attendanceController.presentPercentage(totalDays);
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Classroom info
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF1A1C1E),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(widget.classroom.name,
-                            style: GoogleFonts.poppins(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white)),
-                        const SizedBox(height: 8),
-                        Text("Time: ${widget.classroom.startTime} - ${widget.classroom.endTime}",
-                            style: const TextStyle(color: Colors.grey, fontSize: 14)),
-                        const SizedBox(height: 4),
-                        Text("Teacher: ${widget.classroom.teacher}",
-                            style: const TextStyle(color: Colors.grey, fontSize: 14)),
-                        const SizedBox(height: 4),
-                        Text("Child: ${widget.child.name}",
-                            style: const TextStyle(color: Colors.grey, fontSize: 14)),
-                      ],
-                    ),
-                  ),
+
 
                   const SizedBox(height: 24),
                   // Attendance
@@ -234,7 +214,56 @@ class _ClassroomDetailPageState extends State<ClassroomDetailPage> {
                   ...progressController.progresses.map(progressCard).toList(),
                 ],
               );
-            })
+            }),const SizedBox(height: 24),
+// Activities Section Title
+            const Text(
+              'Activities',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,color: Colors.white),
+            ),
+            const SizedBox(height: 8),
+
+// Activities List
+            Obx(() {
+              if (activityController.isLoading.value) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              if (activityController.activities.isEmpty) {
+                return const Text(
+                  "No activities for this class yet",
+                  style: TextStyle(color: Colors.white70),
+                );
+              }
+
+              return Column(
+                children: activityController.activities.map((a) {
+                  // Determine icon based on type (optional)
+                  IconData icon = Icons.assignment;
+                  if (a.title.toLowerCase().contains('quiz')) {
+                    icon = Icons.quiz;
+                  } else if (a.title.toLowerCase().contains('group')) {
+                    icon = Icons.groups;
+                  }
+                  return InkWell(
+                    onTap: () {
+                      // Navigate to details page
+                      Get.to(() => ActivityDetailsPage(activity: a));
+                    },
+                    child: activityCard(
+                      icon: icon,
+                      title: a.title,
+                      subtitle: a.description,
+                    ),
+                  );
+
+                  return activityCard(
+                    icon: icon,
+                    title: a.title,
+                    subtitle: a.description,
+                  );
+                }).toList(),
+              );
+            }),
           ],
         ),
 
@@ -310,6 +339,33 @@ Widget progressCard(model.Progress p) {
           p.notes,
           style: const TextStyle(color: Colors.white),
         ),
+      ],
+    ),
+  );
+}
+Widget activityCard({required IconData icon, required String title, required String subtitle}) {
+  return Container(
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: const Color(0xFF1A1C1E),
+      borderRadius: BorderRadius.circular(16),
+    ),
+    margin: const EdgeInsets.only(bottom: 8),
+    child: Row(
+      children: [
+        Icon(icon, color: const Color(0xFF3B82F6), size: 28),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+              const SizedBox(height: 4),
+              Text(subtitle, style: const TextStyle(color: Color(0xFFE0E0E0), fontSize: 12)),
+            ],
+          ),
+        ),
+        const Icon(Icons.chevron_right, color: Colors.grey, size: 28),
       ],
     ),
   );
