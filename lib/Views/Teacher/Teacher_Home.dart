@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:frontend/Controllers/UserController.dart';
 import 'package:get/get.dart';
 import 'package:frontend/Controllers/ClassroomController.dart';
+import 'Classroom.dart';
 import 'CreateClass.dart';
 import 'navbar.dart';
 
@@ -127,10 +128,18 @@ class _TeacherDashboardPageState extends State<TeacherDashboardPage> {
                         itemBuilder: (context, index) {
                           final classroom = classroomController.classrooms[index];
 
-                          return ClassCard(
-                            title: classroom.name,
-                            subtitle: '${classroom.children.length} Students',
+                          return GestureDetector(
+                            onTap: () {
+                              Get.to(() => ClassDetailsPage(
+                                classroom: classroom,
+                              ));
+                            },
+                            child: ClassCard(
+                              title: classroom.name,
+                              subtitle: '${classroom.children.length} Students',
+                            ),
                           );
+
                         },
                       );
                     }),
@@ -194,6 +203,7 @@ class ClassCard extends StatelessWidget {
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: TeacherDashboardPage.primary,
+
                   ),
                 ),
                 const SizedBox(height: 4),
