@@ -33,4 +33,27 @@ class ChildrenController extends GetxController {
       isLoading.value = false;
     }
   }
+
+Future<void> fetchChildren1() async {
+  try {
+    isLoading.value = true;
+
+    final response = await DioClient.dio.get('/children');
+    final List data = response.data['data'];
+
+    final allChildren = data.map((e) => Child.fromJson(e)).toList();
+
+    // ✅ Safe change: show all children
+    // final parentId = userController.user.value!.id;
+    // children.value = allChildren.where((child) => child.parentId == parentId).toList();
+
+    children.value = allChildren; // display all children
+
+    print("Loaded ${children.length} children");
+  } catch (e) {
+    print("Error loading children: $e");
+  } finally {
+    isLoading.value = false;
+  }
+}
 }
