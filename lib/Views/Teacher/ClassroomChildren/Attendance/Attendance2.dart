@@ -7,6 +7,8 @@ import 'package:frontend/Models/Child.dart';
 import 'package:frontend/Controllers/UserController.dart';
 import 'package:frontend/Core/Network/DioClient.dart';
 
+import 'package:frontend/Controllers/AttandanceController.dart';
+
 class DailyAttendancePage extends StatefulWidget {
   final DateTime selectedDate;
   final Classroom classroom;
@@ -33,12 +35,32 @@ class _DailyAttendancePageState extends State<DailyAttendancePage> {
 
   /// childId -> true (present) / false (absent)
   final Map<int, bool> attendance = {};
+  bool alreadySaved = false;
+
 
   @override
   void initState() {
     super.initState();
-    fetchClassroomChildren();
+    final AttendanceController attendanceController =
+    Get.put(AttendanceController());
+
+    fetchClassroomChildren().then((_) async {
+      // 🔴 IMPORTANT: fetch attendance FIRST
+      await attendanceController.fetchAttendance(
+        classroomId: widget.classroom.id,
+        childId: children.isNotEmpty ? children.first.id : 0,
+      );
+
+      alreadySaved = attendanceController.attendanceExistsForDate(
+        classroomId: widget.classroom.id,
+        date: _formatDate(widget.selectedDate),
+      );
+
+      setState(() {});
+    });
   }
+
+
 
   Future<void> fetchClassroomChildren() async {
     try {
@@ -135,22 +157,23 @@ class _DailyAttendancePageState extends State<DailyAttendancePage> {
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _saveAttendance,
+                  onPressed: alreadySaved ? null : _saveAttendance,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: primary,
+                    backgroundColor: alreadySaved ? Colors.grey : primary,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
                   ),
-                  child: const Text(
-                    "Save Attendance",
-                    style: TextStyle(
+                  child: Text(
+                    alreadySaved ? "Attendance Already Saved" : "Save Attendance",
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
+
               ),
             ),
           ],
@@ -160,25 +183,26 @@ class _DailyAttendancePageState extends State<DailyAttendancePage> {
   }
 
   String _formatDate(DateTime date) {
-    const months = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December"
-    ];
-    return "${date.day}-${date.month}-${date.year}";
+    final day = date.day.toString().padLeft(2, '0');
+    final month = date.month.toString().padLeft(2, '0');
+    return "$day-$month-${date.year}";
   }
 
   Future<void> _saveAttendance() async {
     final token = Get.find<UserController>().accessToken.value;
+
+
+    if (alreadySaved) {
+      Get.snackbar(
+        "Not Allowed",
+        "Attendance for this date is already saved",
+        backgroundColor: Colors.orange,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+
 
     try {
       for (final child in children) {
@@ -215,7 +239,10 @@ class _DailyAttendancePageState extends State<DailyAttendancePage> {
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
-    }
+    }setState(() {
+      alreadySaved = true;
+    });
+
   }
 }
 
@@ -242,6 +269,7 @@ class _AttendanceCard extends StatelessWidget {
     final initials = name.isNotEmpty
         ? name.split(' ').map((e) => e[0]).take(2).join()
         : "?";
+
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
-import '../../../Controllers/ChildrenController.dart';
-import '../../../Models/Child.dart';
-import '../navbar.dart';
+import '../../../../Controllers/ChildrenController.dart';
+import '../../../../Models/Child.dart';
+import '../../navbar.dart';
 import 'package:dio/dio.dart';
 import 'package:frontend/Models/Classroom.dart';
 import 'package:frontend/Core/Network/DioClient.dart';

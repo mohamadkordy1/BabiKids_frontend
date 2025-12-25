@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
-
+import 'package:frontend/Models/Classroom.dart';
 class ActivityDetailsPage extends StatelessWidget {
-  const ActivityDetailsPage({super.key});
-
+  const ActivityDetailsPage({super.key, required this.classroom});
+final Classroom classroom;
   static const Color primary = Color(0xFF3B82F6);
   static const Color danger = Color(0xFFEF4444);
   static const Color backgroundDark = Color(0xFF111827);

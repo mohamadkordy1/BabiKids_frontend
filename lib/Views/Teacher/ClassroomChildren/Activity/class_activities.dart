@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/Models/Classroom.dart';
+import 'package:frontend/Views/Teacher/ClassroomChildren/Activity/CreateActivity.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
-import '../navbar.dart';
-import 'Activity/ActivityDetails.dart';
+import '../../navbar.dart';
+import 'ActivityDetails.dart';
 import 'package:frontend/Models/Classroom.dart';
 class ClassActivitiesPage extends StatelessWidget {
+
   const ClassActivitiesPage({super.key,required this.classroom});
 final  Classroom classroom;
+
+
   static const Color primary = Color(0xFF3B82F6);
   static const Color backgroundDark = Color(0xFF111827);
   static const Color cardDark = Color(0xFF1F2937);
@@ -56,7 +60,7 @@ final  Classroom classroom;
               child: ElevatedButton.icon(
                 onPressed: () {
 
-                 Get.to(ActivityDetailsPage(classroom:classroom,));
+                 Get.to(CreateActivityPage(classroom: classroom,));
                 },
                 icon: const Icon(Icons.add_circle),
                 label: const Text("Create New Activity"),

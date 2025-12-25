@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
-import '../../../Models/Classroom.dart';
-import '../../../Models/Child.dart';
-import '../../../Controllers/UserController.dart';
-import '../../../Core/Network/DioClient.dart';
-import '../navbar.dart';
+import '../../../../Models/Classroom.dart';
+import '../../../../Models/Child.dart';
+import '../../../../Controllers/UserController.dart';
+import '../../../../Core/Network/DioClient.dart';
+import '../../navbar.dart';
 import 'package:dio/dio.dart';
 
 class RemoveChildPage extends StatelessWidget {

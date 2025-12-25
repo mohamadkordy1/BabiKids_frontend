@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
+import 'package:frontend/Models/Classroom.dart';
 
 class CreateActivityPage extends StatefulWidget {
-  const CreateActivityPage({super.key});
-
+  const CreateActivityPage({super.key,required this.classroom});
+final Classroom classroom;
   @override
   State<CreateActivityPage> createState() => _CreateActivityPageState();
 }

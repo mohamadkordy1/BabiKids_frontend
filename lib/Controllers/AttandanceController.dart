@@ -39,6 +39,16 @@ import 'UserController.dart';class AttendanceController extends GetxController {
       isLoading.value = false;
     }
   }
+  bool attendanceExistsForDate({
+    required int classroomId,
+    required String date,
+  }) {
+    return attendances.any(
+          (a) =>
+      a.classroomId == classroomId &&
+          a.date == date,
+    );
+  }
 
   // 🔹 CHANGE MONTH/YEAR (NO API CALL)
   void changeMonthYear(int month, int year) {
