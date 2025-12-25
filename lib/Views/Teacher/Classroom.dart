@@ -7,7 +7,7 @@ import '../../../Controllers/UserController.dart';
 import '../../../Core/Network/DioClient.dart';
 import 'ClassroomChildren/AddChild.dart';
 import 'ClassroomChildren/RemoveChild.dart';
-import 'ClassroomChildren/AttendanceDatePage.dart';
+import 'ClassroomChildren/Attendance/AttendanceDatePage.dart';
 import 'ClassroomChildren/class_activities.dart';
 import 'ClassroomChildren/EditClassroom.dart';
 import 'navbar.dart';
@@ -81,7 +81,7 @@ class ClassDetailsPage extends StatelessWidget {
                     Get.to(() => RemoveChildPage(classroom: classroom,));
                   }, "Remove Child", Colors.red),
                   _actionButton(Icons.checklist, () {
-                    Get.to(() => AttendanceDatePage());
+                    Get.to(() => AttendanceDatePage(classroom: classroom,));
                   }, "Attendance", Colors.green),
                   _actionButton(Icons.local_activity, () {
                     Get.to(() => ClassActivitiesPage());
