@@ -15,11 +15,11 @@ class Activity {
 
   factory Activity.fromJson(Map<String, dynamic> json) {
     return Activity(
-      id: json['id'],
-      title: json['title'],
-      description: json['description'],
-      createdBy: json['created_by'],
-      classroomId: json['classroom_id'],
+      id: int.parse(json['id'].toString()),
+      title: json['title'] ?? '',
+      description: json['description'] ?? '',
+      createdBy: int.parse(json['created_by'].toString()),
+      classroomId: int.parse(json['classroom_id'].toString()),
     );
   }
 }

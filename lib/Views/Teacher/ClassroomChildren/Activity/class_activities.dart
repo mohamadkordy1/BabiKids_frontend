@@ -5,12 +5,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
 import '../../navbar.dart';
 import 'ActivityDetails.dart';
-import 'package:frontend/Models/Classroom.dart';
+import 'package:frontend/Controllers/ActivityController.dart';
+
 class ClassActivitiesPage extends StatelessWidget {
-
-  const ClassActivitiesPage({super.key,required this.classroom});
-final  Classroom classroom;
-
+  const ClassActivitiesPage({super.key, required this.classroom});
+  final Classroom classroom;
 
   static const Color primary = Color(0xFF3B82F6);
   static const Color backgroundDark = Color(0xFF111827);
@@ -18,10 +17,14 @@ final  Classroom classroom;
 
   @override
   Widget build(BuildContext context) {
+    // Initialize controller
+    final ActivityController activityController = Get.put(ActivityController());
+    // Load activities for this classroom
+    activityController.loadActivitiesForClass(classroom.id);
+
     return Scaffold(
       backgroundColor: backgroundDark,
       bottomNavigationBar: const TeacherBottomNav(currentIndex: 0),
-
       body: SafeArea(
         child: Column(
           children: [
@@ -59,8 +62,7 @@ final  Classroom classroom;
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: ElevatedButton.icon(
                 onPressed: () {
-
-                 Get.to(CreateActivityPage(classroom: classroom,));
+                  Get.to(CreateActivityPage(classroom: classroom));
                 },
                 icon: const Icon(Icons.add_circle),
                 label: const Text("Create New Activity"),
@@ -83,31 +85,39 @@ final  Classroom classroom;
 
             /// ACTIVITIES LIST
             Expanded(
-              child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                children: const [
-                  _ActivityTile(
-                    icon: Icons.quiz,
-                    title: "Geometry Quiz",
-                    subtitle: "10 questions - Due: Nov 25",
-                  ),
-                  _ActivityTile(
-                    icon: Icons.menu_book,
-                    title: "Fractions Reading",
-                    subtitle: "5 pages - Due: Nov 22",
-                  ),
-                  _ActivityTile(
-                    icon: Icons.videocam,
-                    title: "Multiplication Video",
-                    subtitle: "12 minutes - Due: Nov 20",
-                  ),
-                  _ActivityTile(
-                    icon: Icons.brush,
-                    title: "Drawing Shapes",
-                    subtitle: "Creative Task - Due: Nov 18",
-                  ),
-                ],
-              ),
+              child: Obx(() {
+                if (activityController.isLoading.value) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (activityController.activities.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      "No activities found.",
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  );
+                }
+
+                return ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: activityController.activities.length,
+                  itemBuilder: (context, index) {
+                    final activity = activityController.activities[index];
+                    return GestureDetector(
+                      onTap: () {
+                        Get.to(() => ActivityDetailsPage(activity: activity));
+                      },
+                      child: _ActivityTile(
+                        icon: Icons.quiz,
+                        title: activity.title,
+                        subtitle: activity.description,
+                      ),
+                    );
+                  },
+                );
+
+              }),
             ),
           ],
         ),
@@ -115,6 +125,7 @@ final  Classroom classroom;
     );
   }
 }
+
 class _ActivityTile extends StatelessWidget {
   final IconData icon;
   final String title;

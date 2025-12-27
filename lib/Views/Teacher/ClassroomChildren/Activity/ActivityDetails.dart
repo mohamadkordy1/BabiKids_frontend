@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/Models/User.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
-import 'package:frontend/Models/Classroom.dart';
+import 'package:frontend/Models/Activity.dart';
+import 'package:frontend/Controllers/UserController.dart';
+import 'package:dio/dio.dart';
+import '../../../../Core/Network/DioClient.dart';
+
 class ActivityDetailsPage extends StatelessWidget {
-  const ActivityDetailsPage({super.key, required this.classroom});
-final Classroom classroom;
+  final Activity activity; // receive the selected activity
+
+  const ActivityDetailsPage({super.key, required this.activity});
+
   static const Color primary = Color(0xFF3B82F6);
   static const Color danger = Color(0xFFEF4444);
   static const Color backgroundDark = Color(0xFF111827);
@@ -35,162 +42,139 @@ final Classroom classroom;
                       "Activity Details",
                       textAlign: TextAlign.center,
                       style: GoogleFonts.manrope(
-                        fontSize: 20,
+                        fontSize: 22,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
                     ),
                   ),
-                  const SizedBox(width: 48), // placeholder for spacing
+                  const SizedBox(width: 48),
                 ],
               ),
             ),
 
-            /// ACTION BUTTONS
+            /// DELETE BUTTON
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        // TODO: Implement delete logic
-                      },
-                      icon: const Icon(Icons.delete, color: danger),
-                      label: const Text("Delete Activity"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: danger.withOpacity(0.2),
-                        foregroundColor: danger,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: ElevatedButton.icon(
+                onPressed: () async {
+                  final confirm = await Get.dialog<bool>(
+                    AlertDialog(
+                      title: const Text("Confirm Delete"),
+                      content: const Text("Are you sure you want to delete this activity?"),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Get.back(result: false),
+                          child: const Text("Cancel"),
                         ),
-                        textStyle: GoogleFonts.manrope(
-                          fontWeight: FontWeight.bold,
+                        TextButton(
+                          onPressed: () => Get.back(result: true),
+                          child: const Text("Delete"),
                         ),
-                      ),
+                      ],
                     ),
+                  );
+
+                  if (confirm != true) return;
+
+                  try {
+                    final token = Get.find<UserController>().accessToken.value;
+                    final response = await DioClient.dio.delete(
+                      'http://babikids.test/api/v1/activities/${activity.id}',
+                      options: Options(headers: {"Authorization": "Bearer $token"}),
+                    );
+
+                    if (response.statusCode == 200) {
+                      Get.back(result: true); // go back and notify previous page
+                      Get.snackbar(
+                        "Deleted",
+                        "Activity deleted successfully",
+                        backgroundColor: Colors.green,
+                        colorText: Colors.white,
+                      );
+                    } else {
+                      Get.snackbar(
+                        "Error",
+                        "Failed to delete activity",
+                        backgroundColor: Colors.red,
+                        colorText: Colors.white,
+                      );
+                    }
+                  } catch (e) {
+                    Get.snackbar(
+                      "Error",
+                      "Failed to delete activity: $e",
+                      backgroundColor: Colors.red,
+                      colorText: Colors.white,
+                    );
+                  }
+                },
+
+
+                icon: const Icon(Icons.delete, color: Colors.white),
+                label: const Text("Delete Activity"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: danger,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        // TODO: Implement edit logic
-                      },
-                      icon: const Icon(Icons.edit, color: Colors.white),
-                      label: const Text("Edit Activity"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: primary,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                        textStyle: GoogleFonts.manrope(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
+                  textStyle: GoogleFonts.manrope(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
                   ),
-                ],
+                ),
               ),
             ),
+
 
             /// ACTIVITY CARD
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: cardDark,
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      /// Title & Due Date
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Geometry Quiz",
-                            style: GoogleFonts.manrope(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            "Due: November 25",
-                            style: GoogleFonts.manrope(
-                              fontSize: 14,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-
-                      /// Description
-                      Text(
-                        "This quiz covers the fundamental concepts of geometry discussed in Chapter 3. Students will be tested on identifying shapes, understanding angles, and basic area calculations. The quiz consists of 10 multiple-choice questions and should take approximately 20 minutes to complete. Make sure to review the chapter materials before starting.",
-                        style: GoogleFonts.manrope(
-                          fontSize: 16,
-                          color: Colors.grey[300],
-                          height: 1.5,
+                child: SizedBox(
+                  width: double.infinity, // makes card full width
+                  child: Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: cardDark,
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        /// Title
+                        Text(
+                          activity.title,
+                          style: GoogleFonts.manrope(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+
+                        /// Description
+                        Text(
+                          activity.description,
+                          style: GoogleFonts.manrope(
+                            fontSize: 16,
+                            color: Colors.grey[300],
+                            height: 1.6,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ),
-
-            /// BOTTOM NAV
-            Container(
-              decoration: const BoxDecoration(
-                border: Border(
-                  top: BorderSide(color: Colors.grey),
-                ),
-                color: backgroundDark,
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.dashboard, color: primary, size: 28),
-                      const SizedBox(height: 4),
-                      Text(
-                        "Dashboard",
-                        style: GoogleFonts.manrope(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: primary,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.settings, color: Colors.grey, size: 28),
-                      const SizedBox(height: 4),
-                      Text(
-                        "Settings",
-                        style: GoogleFonts.manrope(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
               ),
             ),
           ],
