@@ -40,18 +40,22 @@ class ClassroomController extends GetxController {
 
 
   // ------------------- Create a New Class -------------------
+  // ------------------- Create a New Class -------------------
   Future<bool> createClassroom({
     required String name,
     required String startTime,
     required String endTime,
   }) async {
-    if (userController.user.value == null) return false;
-
-
-
     try {
       final response = await DioClient.dio.post(
         '/classrooms',
+        data: {
+          "name": name,
+          "start_time": startTime,
+          "end_time": endTime,
+          "teacher_id": userController.user.value!.id,
+          "activities_id": null,
+        },
         options: Options(
           headers: {
             'Authorization': 'Bearer ${userController.accessToken.value}',
@@ -60,14 +64,60 @@ class ClassroomController extends GetxController {
       );
 
       if (response.statusCode == 201) {
-        final newClass = Classroom.fromJson(response.data['data']);
-        classrooms.add(newClass); // add newly created class to the list
+        final newClass =
+        Classroom.fromJson(response.data['data']);
+        classrooms.add(newClass);
         return true;
       }
+
       return false;
     } catch (e) {
       print("Error creating classroom: $e");
       return false;
     }
   }
+
+// ------------------- Update Class -------------------
+Future<bool> updateClassroom({
+  required int classroomId,
+  required String name,
+  required String startTime,
+  required String endTime,
+}) async {
+  try {
+    final response = await DioClient.dio.put(
+      '/classrooms/$classroomId',
+      data: {
+        "name": name,
+        "start_time": startTime,
+        "end_time": endTime,
+        "teacher_id": userController.user.value!.id,
+        "activities_id": null,
+      },
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer ${userController.accessToken.value}',
+        },
+      ),
+    );
+
+    if (response.statusCode == 200) {
+      final updatedClass =
+      Classroom.fromJson(response.data['data']);
+
+      // Update local list safely
+      final index =
+      classrooms.indexWhere((c) => c.id == classroomId);
+      if (index != -1) {
+        classrooms[index] = updatedClass;
+      }
+
+      return true;
+    }
+    return false;
+  } catch (e) {
+    print("Error updating classroom: $e");
+    return false;
+  }
+}
 }

@@ -66,7 +66,7 @@ class _TeacherDashboardPageState extends State<TeacherDashboardPage> {
 
                           final user = controller.user.value;
                           if (user != null) {
-                            Get.to(() => CreateClassPage(user: user));
+                            Get.to(() => CreateClassPage());
                           } else {
                             Get.snackbar('Error', 'User not found');
                           }

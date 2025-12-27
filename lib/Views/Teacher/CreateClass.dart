@@ -5,8 +5,8 @@ import 'package:frontend/Controllers/ClassroomController.dart';
 import 'package:frontend/Models/User.dart';
 
 class CreateClassPage extends StatefulWidget {
-  final User user;
-  const CreateClassPage({super.key, required this.user});
+
+  const CreateClassPage({super.key, });
 
   static const Color primary = Color(0xFF3B82F6);
   static const Color backgroundDark = Color(0xFF111827);
@@ -22,7 +22,8 @@ class _CreateClassPageState extends State<CreateClassPage> {
   final TextEditingController startTimeController = TextEditingController();
   final TextEditingController endTimeController = TextEditingController();
 
-  final ClassroomController classroomController = Get.put(ClassroomController());
+  final ClassroomController classroomController =
+  Get.find<ClassroomController>();
   bool isLoading = false;
 
   void createClass() async {
@@ -134,7 +135,7 @@ class _CreateClassPageState extends State<CreateClassPage> {
                           child: _LabeledInput(
                             controller: endTimeController,
                             label: 'Class Finish Time',
-                            hint: '13:00',
+                            hint: '10:00',
                             inputType: TextInputType.datetime,
                           ),
                         ),
