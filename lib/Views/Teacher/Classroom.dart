@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
 import 'package:dio/dio.dart';
-
+import 'package:frontend/Views/Teacher/ClassroomChildren/Progress/EditProgressTable.dart';
 import '../../../Models/Classroom.dart';
 import '../../../Models/Child.dart';
 import 'package:frontend/Models/Progress.dart' as model;
@@ -107,7 +107,7 @@ class ClassDetailsPage extends StatelessWidget {
                 Get.to(() => CreateProgressPage(classroom: classroom));
               }, "Create Progress", Colors.orangeAccent),
 
-              const SizedBox(height: 16),
+
 
               // SHOW / HIDE PROGRESS BUTTON
               _actionButton(Icons.task_alt, () => showProgress.toggle(),
@@ -221,10 +221,28 @@ class ClassDetailsPage extends StatelessWidget {
   }
 }
 
-// PROGRESS CARD
+// ================= PROGRESS CARD WITH STATUS AND EDIT BUTTON =================
 Widget progressCard(model.Progress p) {
+  // Determine status color
+  Color statusColor;
+  String statusText;
+
+  switch (p.status.toLowerCase()) {
+    case 'completed':
+      statusColor = Colors.green;
+      statusText = 'Completed';
+      break;
+    case 'in-progress':
+      statusColor = Colors.blue;
+      statusText = 'In Progress';
+      break;
+    default:
+      statusColor = Colors.grey;
+      statusText = 'Unknown';
+  }
+
   return Container(
-    width: double.infinity, // make full width
+    width: double.infinity,
     margin: const EdgeInsets.only(bottom: 16),
     padding: const EdgeInsets.all(16),
     decoration: BoxDecoration(
@@ -234,10 +252,38 @@ Widget progressCard(model.Progress p) {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          p.goalTitle,
-          style: const TextStyle(
-              fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text(
+                p.goalTitle,
+                style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
+              ),
+            ),
+            // Status Badge
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: statusColor.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                statusText,
+                style: TextStyle(color: statusColor, fontWeight: FontWeight.bold),
+              ),
+            ),
+            IconButton(
+              onPressed: () {
+                Get.to(() => EditProgressPage(progress: p));
+              },
+              icon: const Icon(Icons.edit, color: Colors.orangeAccent),
+              tooltip: "Edit Progress",
+            ),
+          ],
         ),
         const SizedBox(height: 8),
         Text("Start: ${p.startDate}", style: const TextStyle(color: Colors.white70)),
@@ -248,6 +294,8 @@ Widget progressCard(model.Progress p) {
     ),
   );
 }
+
+
 
 // CHILD TILE
 class _ChildTile extends StatelessWidget {
