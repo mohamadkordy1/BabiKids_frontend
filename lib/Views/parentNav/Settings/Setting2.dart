@@ -42,17 +42,7 @@ class EditAccountPage extends StatelessWidget {
                 onChanged: (v) => controller.phone.value = v,
               ),
 
-              _field(
-                label: "Password",
-                obscure: true,
-                onChanged: (v) => controller.password.value = v,
-              ),
 
-              _field(
-                label: "Confirm Password",
-                obscure: true,
-                onChanged: (v) => controller.confirmPassword.value = v,
-              ),
 
               const SizedBox(height: 32),
 

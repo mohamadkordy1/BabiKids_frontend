@@ -9,8 +9,7 @@ class EditAccountController extends GetxController {
   final name = ''.obs;
   final email = ''.obs;
   final phone = ''.obs;
-  final password = ''.obs;
-  final confirmPassword = ''.obs;
+
 
   final isLoading = false.obs;
 
@@ -24,15 +23,7 @@ class EditAccountController extends GetxController {
   }
 
   Future<void> updateProfile() async {
-    if (password.value.isEmpty || confirmPassword.value.isEmpty) {
-      Get.snackbar("Error", "Password is required");
-      return;
-    }
 
-    if (password.value != confirmPassword.value) {
-      Get.snackbar("Error", "Passwords do not match");
-      return;
-    }
 
     try {
       isLoading.value = true;
@@ -41,16 +32,17 @@ class EditAccountController extends GetxController {
         "name": name.value,
         "email": email.value,
         "PhoneNumber": phone.value,
-        "password": password.value,
-        "password_confirmation": confirmPassword.value,
+
         "role": userController.user.value!.role, // unchanged
       };
 
       /// 🔍 DEBUG (VERY IMPORTANT)
       print("SENDING BODY => $body");
       final dio = DioClient.dio;
-
-      final response = await dio.get('/users/${userController.user.value!.id}');
+      await dio.put(
+        '/users/${userController.user.value!.id}',
+        data: body,
+      );
 
       userController.user.value = userController.user.value!.copyWith(
         name: name.value,
