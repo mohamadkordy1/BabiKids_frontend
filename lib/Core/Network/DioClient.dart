@@ -18,7 +18,7 @@ class DioClient {
   static final Dio dio = Dio(
     BaseOptions(
       baseUrl: 'http://babikids.test/api/v1',
-      connectTimeout: const Duration(milliseconds: 5000),
+      connectTimeout: const Duration(milliseconds: 15000),
       receiveTimeout: const Duration(milliseconds: 3000),
       headers: {
         'Content-Type': 'application/json',

@@ -38,4 +38,47 @@ class PaymentController extends GetxController {
       isLoading.value = false;
     }
   }
+
+  Future<void> fetchPaymentsForUser(int parentId) async {
+    try {
+      isLoading.value = true;
+
+      // Get Dio instance
+      final dio = DioClient.dio;
+
+      // Get token from UserController
+      final token = userController.accessToken;
+
+      // Send request with token
+      final response = await dio.get(
+        '/payments',
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        ),
+      );
+
+      // Parse response
+      final dataJson =
+      response.data is String ? jsonDecode(response.data) : response.data;
+
+      if (dataJson != null && dataJson['data'] != null) {
+        final List list = dataJson['data'];
+
+        // Filter only payments for this parent
+        payments.value = list
+            .map((e) => Payment.fromJson(e))
+            .where((p) => p.parentId == parentId)
+            .toList();
+
+        print("Loaded ${payments.length} payments for parent $parentId");
+      }
+    } catch (e) {
+      print("Error fetching payments: $e");
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
 }

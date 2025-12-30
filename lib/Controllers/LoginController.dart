@@ -37,6 +37,8 @@ class LoginController extends GetxController {
         final role = data['user']['role'];
         if (role == 'teacher') {
           Get.offAllNamed(AppRoute.teacherDashboard);
+        }else  if (role == 'admin') {
+          Get.offAllNamed(AppRoute.admin);
         } else {
           Get.offAllNamed(AppRoute.parentShell);
         }

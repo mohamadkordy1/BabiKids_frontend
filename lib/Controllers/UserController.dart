@@ -2,12 +2,14 @@ import 'package:get/get.dart';
 import 'package:dio/dio.dart';
 import '../Core/Network/DioClient.dart';
 import '../Models/User.dart';
-
+import 'package:frontend/Services/UserService.dart';
 
 
 class UserController extends GetxController {
   var user = Rxn<User>();
   var accessToken = ''.obs;
+  var parents = <User>[].obs;
+  var isLoadingParents = false.obs;
 
   /// Called AFTER LOGIN
   void setUser(User newUser, String token) {
@@ -40,4 +42,34 @@ class UserController extends GetxController {
       print('Update failed: $e');
     }
   }
+
+
+  Future<void> fetchParents() async {
+    try {
+      isLoadingParents.value = true;
+      final dio = Dio(
+        BaseOptions(
+          baseUrl: 'http://babikids.test/api/v1',
+          headers: {
+            'Authorization': 'Bearer ${accessToken.value}',
+          },
+        ),
+      );
+
+      final response = await dio.get('/users');
+
+      final users = (response.data['data'] as List)
+          .map((u) => User.fromJson(u))
+          .toList();
+
+      parents.value =
+          users.where((u) => u.role.toLowerCase() == 'parent').toList();
+    } catch (e) {
+      print('Failed to fetch parents: $e');
+    } finally {
+      isLoadingParents.value = false;
+    }
+  }
+
+
 }

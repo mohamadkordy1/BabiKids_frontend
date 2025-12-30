@@ -3,8 +3,10 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../Controllers/UserController.dart';
 import '../../../Controllers/LogoutController.dart';
-import '../parentNav/Settings/Setting2.dart';
-import 'navbar.dart';
+import '../../../Views/parentNav/Settings/setting2.dart';
+import '../../../Views/parentNav/Settings/setting3.dart';
+import 'AppBottomNav.dart';
+
 
 class SettingsPage extends StatelessWidget {
   SettingsPage({super.key});
@@ -81,7 +83,8 @@ class SettingsPage extends StatelessWidget {
                       _secondaryButton(
                         text: "Change Password",
                         onPressed: () {
-                          // TODO: Change password page
+                          Get.to(() => const ChangePasswordPage());
+
                         },
                       ),
                       const SizedBox(height: 32),
@@ -92,17 +95,15 @@ class SettingsPage extends StatelessWidget {
                           await logoutController.logout();
                         },
                       ),
+
                     ],
                   );
                 }),
               ),
-
-            ),
+            ),   const AppBottomNav(currentIndex: 2),
           ],
         ),
       ),
-      bottomNavigationBar: const TeacherBottomNav(currentIndex: 1),
-
     );
   }
 
