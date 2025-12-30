@@ -15,6 +15,8 @@ class ManageUserRolesPage extends StatefulWidget {
 
 class _ManageUserRolesPageState extends State<ManageUserRolesPage> {
   final UserController userController = Get.find<UserController>();
+  final TextEditingController searchController = TextEditingController();
+  var filteredUsers = <User>[].obs;
 
   static const Color primary = Color(0xFF3B82F6);
   static const Color backgroundDark = Color(0xFF111418);
@@ -24,7 +26,27 @@ class _ManageUserRolesPageState extends State<ManageUserRolesPage> {
   @override
   void initState() {
     super.initState();
-    userController.fetchAllUsers();
+    userController.fetchAllUsers().then((_) {
+      filteredUsers.value = userController.allUsers;
+    });
+
+    searchController.addListener(() {
+      final query = searchController.text.toLowerCase();
+      if (query.isEmpty) {
+        filteredUsers.value = userController.allUsers;
+      } else {
+        filteredUsers.value = userController.allUsers.where((user) {
+          return user.name.toLowerCase().contains(query) ||
+              user.role.toLowerCase().contains(query);
+        }).toList();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -36,7 +58,7 @@ class _ManageUserRolesPageState extends State<ManageUserRolesPage> {
           children: [
             // HEADER
             Padding(
-              padding: const EdgeInsets.fromLTRB(24, 12, 24, 16),
+              padding: const EdgeInsets.fromLTRB(24, 12, 24, 8),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
@@ -50,7 +72,29 @@ class _ManageUserRolesPageState extends State<ManageUserRolesPage> {
               ),
             ),
 
-            // CONTENT
+            // SEARCH BAR
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+              child: TextField(
+                controller: searchController,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  hintText: 'Search by name or role',
+                  hintStyle: TextStyle(color: textSecondary),
+                  filled: true,
+                  fillColor: surfaceDark,
+                  prefixIcon: const Icon(Icons.search, color: textSecondary),
+                  contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+            ),
+
+            // USER LIST
             Expanded(
               child: Obx(() {
                 if (userController.isLoadingUsers.value) {
@@ -59,7 +103,7 @@ class _ManageUserRolesPageState extends State<ManageUserRolesPage> {
                   );
                 }
 
-                if (userController.allUsers.isEmpty) {
+                if (filteredUsers.isEmpty) {
                   return const Center(
                     child: Text(
                       'No users found',
@@ -70,9 +114,9 @@ class _ManageUserRolesPageState extends State<ManageUserRolesPage> {
 
                 return ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
-                  itemCount: userController.allUsers.length,
+                  itemCount: filteredUsers.length,
                   itemBuilder: (context, index) {
-                    final user = userController.allUsers[index];
+                    final user = filteredUsers[index];
                     return _userTile(user);
                   },
                 );
@@ -86,6 +130,7 @@ class _ManageUserRolesPageState extends State<ManageUserRolesPage> {
     );
   }
 
+  // USER TILE
   // USER TILE
   Widget _userTile(User user) {
     final color = _roleColor(user.role);
@@ -102,7 +147,6 @@ class _ManageUserRolesPageState extends State<ManageUserRolesPage> {
       child: InkWell(
         borderRadius: BorderRadius.circular(20),
         onTap: () {
-          // 👉 NEXT PAGE (edit user)
           Get.to(() => EditUserRolePage(user: user));
         },
         child: Padding(
@@ -139,6 +183,15 @@ class _ManageUserRolesPageState extends State<ManageUserRolesPage> {
                         color: Colors.white,
                       ),
                     ),
+                    const SizedBox(height: 2),
+                    Text(
+                      user.email,
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: textSecondary,
+                      ),
+                    ),
                     const SizedBox(height: 6),
                     Container(
                       padding: const EdgeInsets.symmetric(
@@ -166,6 +219,7 @@ class _ManageUserRolesPageState extends State<ManageUserRolesPage> {
       ),
     );
   }
+
 
   Color _roleColor(String role) {
     switch (role.toLowerCase()) {
