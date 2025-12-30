@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../Controllers/UserController.dart';
 import '../../../Controllers/LogoutController.dart';
 import 'setting2.dart';
+import 'setting3.dart';
 
 class SettingsPage extends StatelessWidget {
   SettingsPage({super.key});
@@ -80,7 +81,8 @@ class SettingsPage extends StatelessWidget {
                       _secondaryButton(
                         text: "Change Password",
                         onPressed: () {
-                          // TODO: Change password page
+                          Get.to(() => const ChangePasswordPage());
+
                         },
                       ),
                       const SizedBox(height: 32),

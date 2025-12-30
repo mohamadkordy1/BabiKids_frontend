@@ -12,51 +12,48 @@ class LoginController extends GetxController {
   var showPassword = false.obs;
 
   /// Login user and navigate based on role
-  void loginUser() async {
+  Future<void> loginUser() async {
     final requestBody = {
       'email': email.text.trim(),
       'password': password.text,
     };
 
     try {
-      final response = await DioClient.dio.post(
-        '/login',
-        data: requestBody,
-      );
+      final response = await DioClient.dio.post('/login', data: requestBody);
 
       if (response.statusCode == 200) {
         final data = response.data;
 
-        // Initialize controllers
         final userController = Get.put(UserController(), permanent: true);
         final childrenController = Get.put(ChildrenController(), permanent: true);
 
-        // Set user and token
-        userController.setUser(
-          User.fromJson(data['user']),
-          data['access_token'],
-        );
-
-        // Set token globally for all future requests
+        userController.setUser(User.fromJson(data['user']), data['access_token']);
         DioClient.setToken(data['access_token']);
 
-        // Load children if parent
         if (data['user']['role'] == 'parent') {
           await childrenController.fetchChildren();
         }
 
-        // Navigate based on role
         final role = data['user']['role'];
         if (role == 'teacher') {
           Get.offAllNamed(AppRoute.teacherDashboard);
         } else {
-          Get.offAllNamed(AppRoute.parentShell); // default = parent
+          Get.offAllNamed(AppRoute.parentShell);
         }
       } else {
-        Get.snackbar('Error', 'Login failed: ${response.statusCode}');
+        Get.snackbar('Login Failed', 'Invalid email or password',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.redAccent,
+            colorText: Colors.white,
+            duration: const Duration(seconds: 3));
       }
     } catch (e) {
-      Get.snackbar('Error', 'Login error: $e');
+      Get.snackbar('Login Failed', 'Invalid email or password',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.redAccent,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 3));
     }
   }
+
 }

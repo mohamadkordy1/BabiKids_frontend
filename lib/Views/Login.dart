@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:frontend/Routes/AppRoute.dart';
+
 final LoginController controller = Get.put(LoginController());
 
 class Login extends GetView<LoginController> {
@@ -11,7 +12,7 @@ class Login extends GetView<LoginController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0C0E10), // dark background
+      backgroundColor: const Color(0xFF0C0E10),
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
@@ -19,7 +20,7 @@ class Login extends GetView<LoginController> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Logo Box
+                // Logo
                 Container(
                   height: 64,
                   width: 64,
@@ -27,13 +28,8 @@ class Login extends GetView<LoginController> {
                     color: const Color(0xFF3B82F6),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: const Icon(
-                    Icons.school,
-                    size: 40,
-                    color: Colors.white,
-                  ),
+                  child: const Icon(Icons.school, size: 40, color: Colors.white),
                 ),
-
                 const SizedBox(height: 30),
 
                 // Title
@@ -46,18 +42,12 @@ class Login extends GetView<LoginController> {
                   ),
                   textAlign: TextAlign.center,
                 ),
-
                 const SizedBox(height: 10),
-
                 Text(
                   "Please sign in to continue",
-                  style: GoogleFonts.manrope(
-                    fontSize: 16,
-                    color: Color(0xFFE0E0E0),
-                  ),
+                  style: GoogleFonts.manrope(fontSize: 16, color: Color(0xFFE0E0E0)),
                   textAlign: TextAlign.center,
                 ),
-
                 const SizedBox(height: 35),
 
                 // Email Field
@@ -66,20 +56,13 @@ class Login extends GetView<LoginController> {
                   child: Text(
                     "Email Address",
                     style: GoogleFonts.manrope(
-                      color: Color(0xFFE0E0E0),
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
+                        color: Color(0xFFE0E0E0),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500),
                   ),
                 ),
                 const SizedBox(height: 8),
-
-                _buildInputField(
-                  hint: "Enter your email",
-                  controller: controller.email,
-                  obscure: false,
-                ),
-
+                _buildInputField(hint: "Enter your email", controller: controller.email, obscure: false),
                 const SizedBox(height: 25),
 
                 // Password Field
@@ -88,14 +71,12 @@ class Login extends GetView<LoginController> {
                   child: Text(
                     "Password",
                     style: GoogleFonts.manrope(
-                      color: Color(0xFFE0E0E0),
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
+                        color: Color(0xFFE0E0E0),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500),
                   ),
                 ),
                 const SizedBox(height: 8),
-
                 Obx(() => _buildInputField(
                   hint: "Enter your password",
                   controller: controller.password,
@@ -103,7 +84,6 @@ class Login extends GetView<LoginController> {
                   isPassword: true,
                   onToggle: () => controller.showPassword.toggle(),
                 )),
-
                 const SizedBox(height: 30),
 
                 // Sign In Button
@@ -113,11 +93,25 @@ class Login extends GetView<LoginController> {
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF3B82F6),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                     ),
-                    onPressed: () => controller.loginUser(),
+                    // Inside your Sign In button
+                    onPressed: () async {
+                      try {
+                        await controller.loginUser();
+                      } catch (_) {
+                        // Show short friendly message regardless of the server response
+                        Get.snackbar(
+                          'Login Failed',
+                          'Invalid email or password',
+                          snackPosition: SnackPosition.TOP,
+                          backgroundColor: Colors.redAccent,
+                          colorText: Colors.white,
+                          duration: const Duration(seconds: 3),
+                        );
+                      }
+                    },
+
                     child: Text(
                       "Sign In",
                       style: GoogleFonts.manrope(
@@ -132,28 +126,14 @@ class Login extends GetView<LoginController> {
                 const SizedBox(height: 20),
 
                 // Forgot Password
-                TextButton(
-                  onPressed: () {},
-                  child: Text(
-                    "Forgot Password?",
-                    style: GoogleFonts.manrope(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF3B82F6),
-                    ),
-                  ),
-                ),
 
                 const SizedBox(height: 10),
 
-                // Sign Up Redirect
+                // Sign Up
                 Text.rich(
                   TextSpan(
                     text: "Don't have an account? ",
-                    style: GoogleFonts.manrope(
-                      color: Color(0xFFE0E0E0),
-                      fontSize: 14,
-                    ),
+                    style: GoogleFonts.manrope(color: Color(0xFFE0E0E0), fontSize: 14),
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -161,10 +141,7 @@ class Login extends GetView<LoginController> {
                   onPressed: () => Get.toNamed(AppRoute.registrater),
                   child: Text(
                     "Sign Up",
-                    style: GoogleFonts.manrope(
-                      color: Color(0xFF3B82F6),
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: GoogleFonts.manrope(color: Color(0xFF3B82F6), fontWeight: FontWeight.w600),
                   ),
                 ),
               ],
@@ -192,23 +169,14 @@ class Login extends GetView<LoginController> {
         hintText: hint,
         hintStyle: GoogleFonts.manrope(color: Colors.grey),
         contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide.none,
-        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(
-            color: Color(0x803B82F6),
-            width: 2,
-          ),
+          borderSide: const BorderSide(color: Color(0x803B82F6), width: 2),
         ),
         suffixIcon: isPassword
             ? IconButton(
-          icon: Icon(
-            obscure ? Icons.visibility_off : Icons.visibility,
-            color: const Color(0xFFD1D5DB),
-          ),
+          icon: Icon(obscure ? Icons.visibility_off : Icons.visibility, color: const Color(0xFFD1D5DB)),
           onPressed: onToggle,
         )
             : null,

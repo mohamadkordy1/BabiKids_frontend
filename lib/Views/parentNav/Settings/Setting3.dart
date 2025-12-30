@@ -1,115 +1,132 @@
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
+import 'package:get/get.dart';
+ import 'package:frontend/Controllers/UserController.dart';
+class ChangePasswordPage extends StatefulWidget {
 
-class ChangePasswordPage extends StatelessWidget {
-  const ChangePasswordPage({super.key});
+  const ChangePasswordPage({super.key, });
+
+  @override
+  State<ChangePasswordPage> createState() => _ChangePasswordPageState();
+}
+
+class _ChangePasswordPageState extends State<ChangePasswordPage> {
+  final _formKey = GlobalKey<FormState>();
+
+  final TextEditingController currentPasswordController = TextEditingController();
+  final TextEditingController newPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController = TextEditingController();
+
+  bool isLoading = false;
+
+  Future<void> changePassword() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => isLoading = true);
+    final UserController userController = Get.find<UserController>();
+    try {
+      final response = await Dio().put(
+        'http://babikids.test/api/v1/users/change-password',
+        data: {
+          "current_password": currentPasswordController.text,
+          "new_password": newPasswordController.text,
+          "new_password_confirmation": confirmPasswordController.text,
+        },
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer ${userController.accessToken.value}',
+            'Accept': 'application/json',
+          },
+        ),
+      );
+
+      Get.snackbar('Success', response.data['message'],
+          snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.green, colorText: Colors.white);
+    } on DioError catch (e) {
+      String message = 'Something went wrong';
+      if (e.response != null && e.response?.data != null) {
+        message = e.response?.data['message'] ?? message;
+      }
+      Get.snackbar('Error', message,
+          snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF111827), // background-dark
-
-      // ---------------- APP BAR ----------------
+      backgroundColor: const Color(0xFF111827),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF111827),
+        backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white, size: 30),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text(
-          'Change Password',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
-        ),
+        title: const Text('Change Password'),
         centerTitle: true,
       ),
-
-      // ---------------- BODY ----------------
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    _passwordField(label: 'Old Password', initialValue: '********'),
-                    const SizedBox(height: 20),
-                    _passwordField(label: 'New Password', initialValue: '********'),
-                    const SizedBox(height: 20),
-                    _passwordField(label: 'Confirm New Password', initialValue: '********'),
-                  ],
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              TextFormField(
+                controller: currentPasswordController,
+                obscureText: true,
+                style: const TextStyle(color: Colors.white),
+                decoration: const InputDecoration(
+                  labelText: 'Old Password',
+                  labelStyle: TextStyle(color: Colors.grey),
+                  filled: true,
+                  fillColor: Color(0xFF1F2937),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
+                ),
+                validator: (value) => value == null || value.isEmpty ? 'Please enter your current password' : null,
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: newPasswordController,
+                obscureText: true,
+                style: const TextStyle(color: Colors.white),
+                decoration: const InputDecoration(
+                  labelText: 'New Password',
+                  labelStyle: TextStyle(color: Colors.grey),
+                  filled: true,
+                  fillColor: Color(0xFF1F2937),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
+                ),
+                validator: (value) => value == null || value.length < 8 ? 'Password must be at least 8 characters' : null,
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: confirmPasswordController,
+                obscureText: true,
+                style: const TextStyle(color: Colors.white),
+                decoration: const InputDecoration(
+                  labelText: 'Confirm New Password',
+                  labelStyle: TextStyle(color: Colors.grey),
+                  filled: true,
+                  fillColor: Color(0xFF1F2937),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
+                ),
+                validator: (value) => value != newPasswordController.text ? 'Passwords do not match' : null,
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: isLoading ? null : changePassword,
+                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF3B82F6)),
+                  child: isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text('Send', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                 ),
               ),
-            ),
-
-            // ---------------- SEND BUTTON ----------------
-            SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF3B82F6), // primary
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                child: const Text(
-                  'Send',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-          ],
+            ],
+          ),
         ),
       ),
-    );
-  }
-
-  // ---------------- PASSWORD FIELD ----------------
-  Widget _passwordField({required String label, required String initialValue}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            color: Color(0xFF9CA3AF), // text-secondary-dark
-            fontWeight: FontWeight.w500,
-            fontSize: 16,
-          ),
-        ),
-        const SizedBox(height: 8),
-        TextFormField(
-          initialValue: initialValue,
-          obscureText: true,
-          style: const TextStyle(color: Colors.white, fontSize: 16),
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: const Color(0xFF1F2937), // background-surface-dark
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide.none,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(
-                color: Color(0xFF3B82F6),
-                width: 2,
-              ),
-            ),
-          ),
-        ),
-      ],
     );
   }
 }
