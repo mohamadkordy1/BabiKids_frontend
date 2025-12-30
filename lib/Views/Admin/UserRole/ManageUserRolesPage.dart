@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../Controllers/UserController.dart';
-import '../../Models/User.dart';
-import 'admin_navbar/AppBottomNav.dart';
+import '../../../Controllers/UserController.dart';
+import '../../../Models/User.dart';
+import '../admin_navbar/AppBottomNav.dart';
+import 'EditUserRolePage.dart';
 
 class ManageUserRolesPage extends StatefulWidget {
   const ManageUserRolesPage({super.key});
@@ -102,7 +103,7 @@ class _ManageUserRolesPageState extends State<ManageUserRolesPage> {
         borderRadius: BorderRadius.circular(20),
         onTap: () {
           // 👉 NEXT PAGE (edit user)
-          Get.to(() => EditUserPage(user: user));
+          Get.to(() => EditUserRolePage(user: user));
         },
         child: Padding(
           padding: const EdgeInsets.all(16),

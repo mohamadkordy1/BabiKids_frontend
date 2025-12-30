@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/Views/Admin/SelectParentPage.dart';
-import 'package:frontend/Views/Admin/ManageUserRolesPage.dart';
+import 'package:frontend/Views/Admin/UserRole/ManageUserRolesPage.dart';
 import 'package:frontend/Views/Admin/admin_navbar/adminSettings.dart';
 
 class AppBottomNav extends StatelessWidget {
