@@ -5,7 +5,7 @@ import '../../../Controllers/UserController.dart';
 import '../../../Controllers/LogoutController.dart';
 import '../parentNav/Settings/Setting2.dart';
 import 'navbar.dart';
-
+import '../../../Views/parentNav/Settings/setting3.dart';
 class SettingsPage extends StatelessWidget {
   SettingsPage({super.key});
 
@@ -81,7 +81,7 @@ class SettingsPage extends StatelessWidget {
                       _secondaryButton(
                         text: "Change Password",
                         onPressed: () {
-                          // TODO: Change password page
+                          Get.to(() => const ChangePasswordPage());
                         },
                       ),
                       const SizedBox(height: 32),
