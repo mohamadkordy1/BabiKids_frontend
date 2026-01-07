@@ -27,12 +27,13 @@ class PaymentDetailsPage extends StatelessWidget {
       // ---------------- APP BAR ----------------
       appBar: AppBar(
         backgroundColor: const Color(0xFF111418),
-        elevation: 0,
+        foregroundColor: Colors.white,
+
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title:  Text(
           'Payment Details',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),

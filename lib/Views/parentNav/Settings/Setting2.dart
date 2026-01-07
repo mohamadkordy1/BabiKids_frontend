@@ -14,8 +14,9 @@ class EditAccountPage extends StatelessWidget {
       backgroundColor: const Color(0xFF111827),
       appBar: AppBar(
         backgroundColor: const Color(0xFF111827),
+        foregroundColor: Colors.white,
         elevation: 0,
-        title: const Text("Edit Account"),
+        title: const Text("Edit Account" ),
         centerTitle: true,
       ),
       body: SingleChildScrollView(

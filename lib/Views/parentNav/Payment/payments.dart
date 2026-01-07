@@ -17,7 +17,9 @@ class PaymentPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFF121212),
+
       appBar: AppBar(
+        foregroundColor: Colors.white,
         backgroundColor: const Color(0xFF121212),
         elevation: 0,
         title: const Text('Payment History'),

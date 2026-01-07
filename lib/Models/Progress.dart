@@ -1,6 +1,5 @@
 class Progress {
   final int id;
-
   final int classroomId;
   final String goalTitle;
   final String startDate;
@@ -10,7 +9,6 @@ class Progress {
 
   Progress({
     required this.id,
-
     required this.classroomId,
     required this.goalTitle,
     required this.startDate,
@@ -21,14 +19,13 @@ class Progress {
 
   factory Progress.fromJson(Map<String, dynamic> json) {
     return Progress(
-      id: json['id'],
-
-      classroomId: json['classroom_id'],
-      goalTitle: json['goal_title'],
-      startDate: json['start_date'],
-      targetDate: json['target_date'],
-      status: json['status'],
-      notes: json['notes'],
+      id: json['id'] ?? 0,
+      classroomId: json['classroom_id'] ?? 0,
+      goalTitle: json['goal_title'] ?? '',   // ✅ null-safe
+      startDate: json['start_date'] ?? '',   // ✅ null-safe
+      targetDate: json['target_date'] ?? '', // ✅ null-safe
+      status: json['status'] ?? '',           // ✅ null-safe
+      notes: json['notes'] ?? '',             // ✅ null-safe
     );
   }
 }

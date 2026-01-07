@@ -99,13 +99,14 @@ class _DailyAttendancePageState extends State<DailyAttendancePage> {
       backgroundColor: backgroundDark,
       appBar: AppBar(
         backgroundColor: backgroundDark,
-        elevation: 0,
+        elevation: 1,
         title: Text(
           "Attendance",
-          style: GoogleFonts.manrope(fontWeight: FontWeight.bold),
+          style: GoogleFonts.manrope(fontWeight: FontWeight.bold,color: Colors.white),
+
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new),
+          icon: const Icon(Icons.arrow_back_ios_new,color: Colors.white,),
           onPressed: () => Get.back(),
         ),
       ),

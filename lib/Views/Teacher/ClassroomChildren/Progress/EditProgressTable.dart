@@ -184,6 +184,7 @@ class _EditProgressPageState extends State<EditProgressPage> {
         backgroundColor: const Color(0xFF0C0E10),
         title: Text("Edit Progress", style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
         centerTitle: true,
+        foregroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Get.back(),
